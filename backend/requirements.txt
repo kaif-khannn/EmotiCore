@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+transformers
+torch
+librosa
+deepface
+opencv-python-headless
+python-multipart
+tf-keras
