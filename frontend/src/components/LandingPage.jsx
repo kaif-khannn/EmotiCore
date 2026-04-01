@@ -145,10 +145,10 @@ export default function LandingPage({ onGetStarted }) {
   }, []);
 
   return (
-    <div className="min-h-[300vh] bg-transparent text-white relative overflow-x-hidden">
+    <div className="min-h-[300vh] bg-transparent text-white relative overflow-x-hidden font-jakarta">
       
-      {/* Three.js WebGL Interactive Sphere Context */}
-      <div className="fixed top-1/2 left-[70%] transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] z-0 mix-blend-screen">
+      {/* Three.js WebGL Interactive Sphere Context - Full Screen Background */}
+      <div className="fixed inset-0 w-full h-full z-0 opacity-60">
           <Canvas camera={{ position: [0, 0, 5], fov: 60 }}>
              <ambientLight intensity={0.5} />
              <InteractiveSphere scrollY={scrollY} />
@@ -156,82 +156,90 @@ export default function LandingPage({ onGetStarted }) {
       </div>
 
       {/* Top Logo Navbar */}
-      <nav className="absolute top-0 left-0 w-full p-8 z-50 flex items-center">
-         <div className="flex items-center gap-4">
-            <div>
+      <nav className="fixed top-0 left-0 w-full p-8 z-50 flex items-center justify-between pointer-events-none">
+         <div className="flex items-center gap-4 pointer-events-auto">
+            <div className="flex items-center gap-4">
               <svg width="0" height="0">
                 <linearGradient id="gradientBrain" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop stopColor="#30B5FF" offset="0%" />
-                  <stop stopColor="#9C27B0" offset="100%" />
+                  <stop stopColor="var(--accent-primary)" offset="0%" />
+                  <stop stopColor="var(--accent-secondary)" offset="100%" />
                 </linearGradient>
               </svg>
               <Brain size={44} strokeWidth={1.5} className="text-transparent drop-shadow-md" style={{ stroke: 'url(#gradientBrain)' }} />
-            </div>
-            <div className="ml-2">
-              <h1 className="text-4xl font-medium font-outfit text-white tracking-widest">
-                EMOTICORE
-              </h1>
-              <p className="text-[13px] text-[#8e8e93] font-medium tracking-[0.1em] uppercase mt-1">Multi-Modal AI System</p>
+              <div className="ml-2">
+                <h1 className="text-4xl font-extrabold font-syne text-white tracking-tighter">
+                  EMOTICORE
+                </h1>
+                <p className="text-[13px] text-zinc-500 font-semibold tracking-[0.2em] uppercase mt-1">Multi-Modal AI System</p>
+              </div>
             </div>
          </div>
       </nav>
 
       {/* Hero Section */}
-      <div className="relative z-10 pt-56 pb-8 px-12 lg:px-24 min-h-[50vh] flex flex-col justify-center max-w-5xl">
-         <h1 className="text-6xl lg:text-9xl font-outfit font-black tracking-tight leading-tight text-white pt-4 drop-shadow-2xl">
-            DECODE. <br/>
-            HUMAN EMOTION
+      <div className="relative z-10 pt-64 pb-8 px-12 lg:px-24 min-h-[80vh] flex flex-col justify-center items-center text-center max-w-7xl mx-auto">
+         <h1 className="text-7xl lg:text-[10rem] font-syne font-extrabold tracking-tighter leading-[0.85] text-white drop-shadow-2xl">
+            DECODE <br/>
+            <span className="gradient-text">EMOTION</span>
          </h1>
-      </div>
-
-      {/* Hero Description & Call to Action Card [Vertical Layout] */}
-      <div className="relative z-20 px-8 md:px-12 lg:px-24 pb-32 flex justify-center mx-auto w-full max-w-[90rem] mt-24 lg:mt-40">
-         <div className="bg-white/5 backdrop-blur-md border border-white/10 shadow-2xl rounded-[3rem] w-full max-w-4xl p-10 md:p-14 lg:p-16 flex flex-col gap-10 items-center justify-center text-center">
-            <p className="text-xl md:text-3xl text-slate-200 leading-relaxed font-inter tracking-wide drop-shadow-md">
-               Most people hear words. We read emotions. EmotiCore analyzes how you speak, write and express—revealing the emotion behind every interaction. Try it. Watch it understand you.
-            </p>
-            <div className="flex justify-center w-full mt-2">
-               <button onClick={onGetStarted} className="w-fit text-lg lg:text-xl px-10 py-5 rounded-full flex items-center gap-3 tracking-widest font-bold uppercase transition-all hover:scale-105 bg-white/10 hover:bg-white/20 border border-white/20 text-white shadow-lg">
-                  Get Started <ChevronRight size={24} strokeWidth={3} />
-               </button>
-            </div>
+         <p className="mt-12 text-xl md:text-2xl text-zinc-400 max-w-3xl leading-relaxed font-jakarta">
+            Beyond words. Beyond voice. Beyond expressions. <br/>
+            The world's most advanced multi-modal emotion intelligence engine.
+         </p>
+         
+         <div className="mt-16">
+            <button onClick={onGetStarted} className="btn-primary px-12 py-5 text-xl group">
+               Launch Intelligence <ChevronRight size={24} className="group-hover:translate-x-1 transition-transform" />
+            </button>
          </div>
       </div>
 
-      {/* Modality Details Section (Appears as you scroll down) */}
-      <div className="relative z-10 p-12 lg:px-24 min-h-[100vh] flex flex-col items-center justify-center gap-12 max-w-6xl mx-auto text-center">
-         <h2 className="text-4xl lg:text-5xl font-outfit font-bold text-white tracking-wide">
-            Tri-Modal <span className="text-indigo-400">Analysis Engine</span>
+      {/* Hero Description & Call to Action Card [Vertical Layout] */}
+      <div className="relative z-20 px-8 md:px-12 lg:px-24 pb-32 flex justify-center mx-auto w-full max-w-[90rem] mt-40">
+         <div className="obsidian-panel w-full max-w-5xl p-12 md:p-20 flex flex-col gap-10 items-center justify-center text-center border-t-2 border-t-white/10">
+            <p className="text-2xl md:text-4xl text-white leading-tight font-syne font-bold tracking-tight">
+               "Most people hear words. We read the human spectrum."
+            </p>
+            <p className="text-lg md:text-xl text-zinc-400 leading-relaxed max-w-3xl">
+               EmotiCore analyzes how you speak, write and express—revealing the emotion behind every interaction. Try it. Watch it understand you.
+            </p>
+         </div>
+      </div>
+
+      {/* Modality Details Section */}
+      <div className="relative z-10 p-12 lg:px-24 min-h-screen flex flex-col items-center justify-center gap-16 max-w-7xl mx-auto text-center">
+         <h2 className="text-5xl lg:text-7xl font-syne font-extrabold text-white tracking-tight">
+            TRI-MODAL <span className="gradient-text">INTELLIGENCE</span>
          </h2>
-         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 text-left">
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 text-left w-full">
             
-            <div className="glass-card p-8 flex flex-col gap-6 group hover:translate-y-[-10px] transition-all">
-               <div className="w-16 h-16 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-400 group-hover:bg-indigo-400 group-hover:!text-black group-hover:shadow-[0_0_20px_#00f3ff] transition-all">
+            <div className="obsidian-card p-10 flex flex-col gap-6 group hover:-translate-y-2 transition-all border-l-4 border-l-cyan-500/50">
+               <div className="w-16 h-16 rounded-xl bg-cyan-500/10 flex items-center justify-center text-cyan-400 group-hover:bg-cyan-400 group-hover:text-black transition-all shadow-[0_0_20px_rgba(0,243,255,0.2)]">
                   <MessageSquare size={32} />
                </div>
-               <h3 className="font-outfit font-bold text-2xl">Semantic Text</h3>
-               <p className="text-slate-400">
-                  Powered by <span className="text-white">DistilRoBERTa</span>. We analyze your paragraphs, parsing subconscious phrasing and structural intents to predict feelings of sorrow, joy, and fear effortlessly.
+               <h3 className="font-syne font-bold text-3xl">Semantic Text</h3>
+               <p className="text-zinc-400 text-lg leading-relaxed">
+                  Deep linguistic analysis using <span className="text-white">RoBERTa</span>. We parse subconscious phrasing and structural intents to decode emotional subtext.
                </p>
             </div>
 
-            <div className="glass-card p-8 flex flex-col gap-6 group hover:translate-y-[-10px] transition-all" style={{ animationDelay: '0.1s' }}>
-               <div className="w-16 h-16 rounded-2xl bg-pink-500/20 border border-pink-400/30 flex items-center justify-center text-pink-400 group-hover:bg-pink-400 group-hover:!text-black group-hover:shadow-[0_0_20px_#ff0055] transition-all">
+            <div className="obsidian-card p-10 flex flex-col gap-6 group hover:-translate-y-2 transition-all border-l-4 border-l-magenta-500/50" style={{ animationDelay: '0.1s' }}>
+               <div className="w-16 h-16 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400 group-hover:bg-rose-400 group-hover:text-black transition-all shadow-[0_0_20px_rgba(255,0,85,0.2)]">
                   <Mic size={32} />
                </div>
-               <h3 className="font-outfit font-bold text-2xl">Vocal Prosody</h3>
-               <p className="text-slate-400">
-                  Utilizing <span className="text-white">Librosa feature extraction</span>. Upload direct audio recordings to map specific acoustic signatures and vocal fry.
+               <h3 className="font-syne font-bold text-3xl">Vocal Prosody</h3>
+               <p className="text-zinc-400 text-lg leading-relaxed">
+                  Advanced <span className="text-white">Acoustic Fingerprinting</span>. Mapping pitch, cadence, and vocal fry to identify emotional state through sound alone.
                </p>
             </div>
 
-            <div className="glass-card p-8 flex flex-col gap-6 group hover:translate-y-[-10px] transition-all" style={{ animationDelay: '0.2s' }}>
-               <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-400/30 flex items-center justify-center text-amber-400 group-hover:bg-amber-400 group-hover:!text-black group-hover:shadow-[0_0_20px_#fcee0a] transition-all">
+            <div className="obsidian-card p-10 flex flex-col gap-6 group hover:-translate-y-2 transition-all border-l-4 border-l-amber-500/50" style={{ animationDelay: '0.2s' }}>
+               <div className="w-16 h-16 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400 group-hover:bg-amber-400 group-hover:text-black transition-all shadow-[0_0_20px_rgba(252,238,10,0.2)]">
                   <Camera size={32} />
                </div>
-               <h3 className="font-outfit font-bold text-2xl">Facial Optics</h3>
-               <p className="text-slate-400">
-                  A high-speed <span className="text-white">DeepFace & OpenCV</span> pipeline. Access your webcam locally and map real-time facial topography to pinpoint granular emotion scores.
+               <h3 className="font-syne font-bold text-3xl">Facial Optics</h3>
+               <p className="text-zinc-400 text-lg leading-relaxed">
+                  Micro-expression mapping via <span className="text-white">DeepFace</span>. Real-time facial topography analysis for granular emotion scoring.
                </p>
             </div>
 
@@ -239,42 +247,36 @@ export default function LandingPage({ onGetStarted }) {
       </div>
 
       {/* Workflow Architecture Section */}
-      <div className="relative z-10 p-12 lg:px-24 min-h-[100vh] flex flex-col justify-center gap-8 max-w-6xl mx-auto">
-         <h2 className="text-4xl lg:text-5xl font-outfit font-bold text-white tracking-wide text-center mb-12">
-            The <span className="text-pink-400">Workflow</span> Architecture
+      <div className="relative z-10 p-12 lg:px-24 min-h-screen flex flex-col justify-center gap-12 max-w-7xl mx-auto">
+         <h2 className="text-4xl lg:text-6xl font-syne font-extrabold text-white tracking-tight text-center mb-16">
+            CORE <span className="text-zinc-500">PIPELINE</span>
          </h2>
          
-         <div className="flex flex-col md:flex-row gap-6 items-center justify-center w-full">
+         <div className="flex flex-col md:flex-row gap-8 items-stretch justify-center w-full">
             {/* Step 1 */}
-            <div className="flex-1 glass-card p-8 flex flex-col items-center text-center gap-4 group hover:-translate-y-2 transition-transform">
-               <div className="w-16 h-16 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center font-black font-outfit text-2xl mb-2 shadow-[0_0_15px_rgba(0,243,255,0.4)] group-hover:bg-indigo-400 group-hover:!text-black transition-colors">1</div>
-               <h3 className="font-bold text-xl text-white">Data Ingestion</h3>
-               <p className="text-sm text-slate-400 leading-relaxed">
-                  Users securely input raw microphone audio, webcam video feeds, or natural language text streams directly through the Vite React dashboard.
+            <div className="flex-1 obsidian-card p-10 flex flex-col items-center text-center gap-6 group">
+               <div className="w-20 h-20 rounded-full border-2 border-cyan-500/30 text-cyan-400 flex items-center justify-center font-black font-syne text-3xl group-hover:bg-cyan-400 group-hover:text-black transition-all">01</div>
+               <h3 className="font-bold text-2xl text-white">Data Ingestion</h3>
+               <p className="text-zinc-400 leading-relaxed">
+                  Synchronous multi-channel input: raw audio, high-res video feeds, and natural language streams.
                </p>
             </div>
-            
-            {/* Connector */}
-            <div className="hidden md:block w-16 h-[2px] bg-gradient-to-r from-indigo-400 to-pink-400 animate-pulse"></div>
             
             {/* Step 2 */}
-            <div className="flex-1 glass-card p-8 flex flex-col items-center text-center gap-4 group hover:-translate-y-2 transition-transform">
-               <div className="w-16 h-16 rounded-full bg-pink-500/20 text-pink-400 flex items-center justify-center font-black font-outfit text-2xl mb-2 shadow-[0_0_15px_rgba(255,0,85,0.4)] group-hover:bg-pink-400 group-hover:!text-black transition-colors">2</div>
-               <h3 className="font-bold text-xl text-white">Deep Extraction</h3>
-               <p className="text-sm text-slate-400 leading-relaxed">
-                  Our Python FastAPI backend distributes the data to state-of-the-art neural networks (DistilRoBERTa, Librosa, DeepFace) to extract dense latent features.
+            <div className="flex-1 obsidian-card p-10 flex flex-col items-center text-center gap-6 group">
+               <div className="w-20 h-20 rounded-full border-2 border-rose-500/30 text-rose-400 flex items-center justify-center font-black font-syne text-3xl group-hover:bg-rose-400 group-hover:text-black transition-all">02</div>
+               <h3 className="font-bold text-2xl text-white">Neural Extraction</h3>
+               <p className="text-zinc-400 leading-relaxed">
+                  Distributed processing across specialized neural layers for dense latent feature extraction.
                </p>
             </div>
 
-            {/* Connector */}
-            <div className="hidden md:block w-16 h-[2px] bg-gradient-to-r from-pink-400 to-amber-400 animate-pulse"></div>
-
             {/* Step 3 */}
-            <div className="flex-1 glass-card p-8 flex flex-col items-center text-center gap-4 group hover:-translate-y-2 transition-transform">
-               <div className="w-16 h-16 rounded-full bg-amber-500/20 text-amber-400 flex items-center justify-center font-black font-outfit text-2xl mb-2 shadow-[0_0_15px_rgba(252,238,10,0.4)] group-hover:bg-amber-400 group-hover:text-black transition-colors">3</div>
-               <h3 className="font-bold text-xl text-white">Late-Fusion Logic</h3>
-               <p className="text-sm text-slate-400 leading-relaxed">
-                  A sophisticated weighting architecture normalizes the probabilities from all isolated modalities to compute the final, highly accurate human emotion.
+            <div className="flex-1 obsidian-card p-10 flex flex-col items-center text-center gap-6 group">
+               <div className="w-20 h-20 rounded-full border-2 border-amber-500/30 text-amber-400 flex items-center justify-center font-black font-syne text-3xl group-hover:bg-amber-400 group-hover:text-black transition-all">03</div>
+               <h3 className="font-bold text-2xl text-white">Late-Fusion Logic</h3>
+               <p className="text-zinc-400 leading-relaxed">
+                  Probabilistic normalization across modalities to compute the final unified emotion vector.
                </p>
             </div>
          </div>

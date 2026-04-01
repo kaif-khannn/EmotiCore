@@ -94,199 +94,196 @@ export default function AudioEmotion() {
 
   const getEmotionColor = (emotion) => {
     const colors = {
-      Happy: 'bg-[#34c759] shadow-[0_0_15px_rgba(52,199,89,0.5)]',
-      Sad: 'bg-indigo-400 shadow-[0_0_15px_rgba(0,243,255,0.4)]',
-      Angry: 'bg-pink-500 shadow-[0_0_15px_rgba(255,0,85,0.4)]',
-      Neutral: 'bg-slate-400',
-      Fear: 'bg-purple-500 shadow-[0_0_15px_rgba(156,39,176,0.4)]',
-      Surprise: 'bg-amber-400 shadow-[0_0_15px_rgba(252,238,10,0.4)]',
-      Disgust: 'bg-emerald-600'
+      Happy: 'bg-amber-400 shadow-[0_0_20px_rgba(252,238,10,0.3)]',
+      Sad: 'bg-cyan-400 shadow-[0_0_20px_rgba(0,243,255,0.3)]',
+      Angry: 'bg-rose-500 shadow-[0_0_20px_rgba(255,0,85,0.3)]',
+      Neutral: 'bg-zinc-500',
+      Fear: 'bg-purple-500 shadow-[0_0_20px_rgba(168,85,247,0.3)]',
+      Surprise: 'bg-orange-400 shadow-[0_0_20px_rgba(251,146,60,0.3)]',
+      Disgust: 'bg-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.3)]'
     };
-    return colors[emotion] || 'bg-pink-400';
+    return colors[emotion] || 'bg-rose-400';
   };
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto pt-4">
-      <div className="flex items-center gap-4 mb-4 fade-in">
-        <div className="p-4 bg-pink-500/10 border border-pink-500/20 rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.5)]">
-          <Mic className="text-pink-400" size={32} />
+      <div className="flex items-center gap-6 mb-6 fade-in">
+        <div className="p-5 obsidian-panel border-white/10 bg-white/5 flex items-center justify-center text-rose-400 shadow-2xl">
+          <Mic size={36} />
         </div>
         <div>
-          <h2 className="text-3xl font-black font-outfit text-white tracking-wide">Vocal Prosody Analysis</h2>
-          <p className="text-slate-400 text-sm font-bold tracking-widest uppercase mt-1">Librosa + HuBERT Engine</p>
+          <h2 className="text-4xl font-extrabold font-syne text-white tracking-tight">Vocal <span className="gradient-text">Prosody</span></h2>
+          <p className="text-zinc-500 text-[10px] font-bold tracking-[0.3em] uppercase mt-2">Neural Frequency Analysis</p>
         </div>
       </div>
 
       {/* Massive Single Module Card */}
-      <div className="relative w-full min-h-[500px] rounded-[2rem] overflow-hidden shadow-[0_30px_60px_rgba(0,0,0,0.9)] transition-all duration-500">
+      {/* Massive Single Module Card - Optimized for Expansion & Containment */}
+      <div className="relative w-full rounded-[2rem] shadow-[0_40px_80px_rgba(0,0,0,0.9)] transition-all duration-700 bg-[#0a0a0a] border-t border-white/10 overflow-hidden">
           
-          {/* Base Glass Background Layer */}
-          <div className="absolute inset-0 bg-[#1c1c1e] border border-white/5 opacity-40 backdrop-blur-2xl z-0"></div>
+           {/* Foreground App Content Layer */}
+           <div className="relative z-20 w-full flex flex-col p-10 md:p-16 min-h-[500px] font-jakarta">
+              
+              {viewState === 'input' && (
+                 <div className="flex flex-col h-full fade-in flex-1">
+                    <h3 className="text-sm font-bold font-syne uppercase tracking-[0.3em] text-zinc-500 mb-6 px-1">Audio Source</h3>
+                    
+                    <div className="flex-1 w-full flex flex-col items-center justify-center p-12 bg-white/5 border border-white/5 rounded-[2.5rem] shadow-2xl mb-10 relative overflow-hidden group transition-all duration-700">
+                        
+                        {recording && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                             <div className="w-[400px] h-[400px] bg-rose-500/10 rounded-full blur-[100px] animate-pulse"></div>
+                          </div>
+                        )}
 
-          {/* Glowing Animated Border only active when processing */}
-          {viewState === 'processing' && (
-             <>
-               <div className="absolute top-1/2 left-1/2 w-[200%] h-[200%] bg-[conic-gradient(transparent_0deg,transparent_270deg,#ff3b30_360deg)] animate-[spin_2s_linear_infinite] origin-center -translate-x-1/2 -translate-y-1/2 z-0"></div>
-               {/* Inner hollow mask so only border glows */}
-               <div className="absolute inset-[2px] bg-[#111111]/95 rounded-[2rem] z-10 backdrop-blur-3xl"></div>
-             </>
-          )}
-          {viewState !== 'processing' && (
-             <div className="absolute inset-0 bg-[#1c1c1e]/60 backdrop-blur-3xl z-10 border border-[#2a2a2c] rounded-[2rem]"></div>
-          )}
+                        <div className="relative z-10 flex flex-col items-center">
+                          <button 
+                            onClick={recording ? stopRecording : (!audioURL ? startRecording : undefined)}
+                            className={`w-32 h-32 rounded-full flex items-center justify-center mb-10 transition-all border outline-none group-hover:scale-105 ${
+                              recording ? 'bg-rose-500 border-rose-400 shadow-[0_0_50px_rgba(255,0,85,0.4)] animate-pulse' : 
+                              audioURL ? 'bg-emerald-500/20 border-emerald-500/50 shadow-[0_0_30px_rgba(16,185,129,0.2)]' :
+                              'bg-white text-black border-white shadow-2xl'
+                            }`}
+                          >
+                            {recording ? <Square fill="currentColor" size={40} /> : 
+                             audioURL ? <Play size={48} className="text-emerald-400 translate-x-1" fill="currentColor" /> : 
+                             <Mic size={56} />}
+                          </button>
+                          
+                          <h2 className="text-4xl font-syne font-extrabold mb-3 tracking-tighter text-white">
+                            {recording ? formatTime(recordTimer) : (audioURL ? 'SIGNAL READY' : 'INITIALIZE')}
+                          </h2>
+                          <p className="text-[10px] font-bold tracking-[0.4em] text-zinc-500 uppercase">
+                            {recording ? 'Capturing Neural Resonance' : 'Awaiting Vocal Input'}
+                          </p>
+                        </div>
 
-          {/* Foreground App Content Layer */}
-          <div className="relative z-20 w-full h-full flex flex-col p-8 md:p-12 min-h-[500px]">
-             
-             {viewState === 'input' && (
-                <div className="flex flex-col h-full fade-in flex-1">
-                   <h3 className="text-2xl font-black font-outfit uppercase tracking-widest text-white mb-4 drop-shadow-lg">INPUT AUDIO</h3>
-                   <p className="text-[#8e8e93] text-sm uppercase font-bold tracking-[0.15em] mb-8 leading-relaxed max-w-2xl">
-                     RECORD YOUR VOICE OR UPLOAD AN AUDIO FILE. OUR PIPELINE EXTRACTS MICRO-PITCH MODULATIONS AND VOCAL FRY MAPS INSTANTLY.
-                   </p>
-                   
-                   <div className="flex-1 w-full flex flex-col items-center justify-center p-8 bg-[#111111]/80 border border-t-[rgba(255,255,255,0.1)] border-x-transparent border-b-transparent rounded-2xl shadow-inner mb-6 relative overflow-hidden">
-                       
-                       {recording && (
-                         <div className="absolute inset-0 flex items-center justify-center opacity-40">
-                            <div className="w-56 h-56 bg-red-500 rounded-full blur-[60px] animate-pulse"></div>
-                         </div>
-                       )}
-
-                       <div className="relative z-10 flex flex-col items-center">
-                         <button 
-                           onClick={recording ? stopRecording : (!audioURL ? startRecording : undefined)}
-                           className={`w-24 h-24 rounded-full flex items-center justify-center mb-6 transition-all border outline-none ${
-                             recording ? 'bg-red-500 hover:bg-red-600 border-red-400 shadow-[0_0_30px_rgba(255,0,0,0.6)] animate-pulse' : 
-                             audioURL ? 'bg-[#34c759]/20 border-[#34c759]/50 shadow-[0_0_20px_rgba(52,199,89,0.3)]' :
-                             'bg-pink-500 hover:bg-pink-600 border-pink-400 shadow-[0_0_30px_rgba(255,0,85,0.5)] hover:scale-105'
-                           }`}
-                         >
-                           {recording ? <Square fill="white" size={32} className="text-white" /> : 
-                            audioURL ? <Play size={32} className="text-[#34c759]" fill="#34c759" /> : 
-                            <Mic size={40} className="text-white" />}
-                         </button>
-                         
-                         <h2 className="text-2xl font-outfit font-black mb-1">{recording ? formatTime(recordTimer) : (audioURL ? 'AUDIO READY' : 'CLICK TO RECORD')}</h2>
-                         <p className="text-sm font-bold tracking-widest text-slate-400 uppercase">{recording ? 'Recording voice sample...' : 'Max duration: 30s'}</p>
-                       </div>
-
-                       {!recording && !audioURL && (
-                         <div className="mt-8 relative flex items-center w-full justify-center gap-4">
-                           <div className="w-24 border-t border-white/10"></div>
-                           <span className="text-slate-500 text-xs font-bold uppercase tracking-widest">OR UPLOAD FILE</span>
-                           <div className="w-24 border-t border-white/10"></div>
-                         </div>
-                       )}
-                       
-                       {!recording && !audioURL && (
-                         <label className="mt-4 flex items-center justify-center gap-3 p-3 px-6 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full cursor-pointer transition-colors">
-                           <Upload size={18} className="text-slate-400" />
-                           <span className="text-sm font-bold uppercase tracking-wider text-slate-300">Browse...</span>
-                           <input type="file" accept="audio/*" className="hidden" onChange={handleFileUpload} />
-                         </label>
-                       )}
-                   </div>
-                   
-                   <div className="flex justify-between items-center mt-2">
-                      <button 
-                         onClick={() => { setAudioURL(null); setFile(null); }}
-                         className={`text-slate-500 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest ${audioURL ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
-                      >
-                         Discard Audio
-                      </button>
-                      <button 
-                        onClick={handleAnalyze}
-                        disabled={!audioURL}
-                        className={`px-8 py-5 rounded-full flex items-center gap-3 tracking-widest font-bold uppercase transition-all shadow-lg text-white ${
-                            audioURL ? "bg-[#ff9500]/15 hover:bg-[#ff9500]/30 border border-[#ff9500]/40 border-t-[#ff9500]/70 shadow-[0_10px_30px_rgba(255,149,0,0.3)] hover:shadow-[0_15px_40px_rgba(255,149,0,0.5)] hover:scale-105" : "bg-white/5 text-slate-500 cursor-not-allowed border border-white/10"
-                        }`}
-                      >
-                         <Zap size={20} /> ANALYZE EMOTION
-                      </button>
-                   </div>
-                </div>
-             )}
+                        {!recording && !audioURL && (
+                          <div className="mt-12 flex flex-col items-center gap-6 w-full max-w-xs">
+                            <div className="flex items-center w-full gap-4 opacity-50">
+                               <div className="flex-1 h-px bg-zinc-800"></div>
+                               <span className="text-[10px] font-bold text-zinc-600 tracking-widest uppercase">OR</span>
+                               <div className="flex-1 h-px bg-zinc-800"></div>
+                            </div>
+                            
+                            <label className="group/btn flex items-center justify-center gap-4 py-4 px-10 bg-zinc-900 hover:bg-zinc-800 border border-white/5 rounded-2xl cursor-pointer transition-all shadow-xl active:scale-95">
+                               <Upload size={20} className="text-zinc-500 group-hover/btn:text-white transition-colors" />
+                               <span className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-400 group-hover/btn:text-white transition-colors">Import stream</span>
+                               <input type="file" accept="audio/*" className="hidden" onChange={handleFileUpload} />
+                            </label>
+                          </div>
+                        )}
+                    </div>
+                    
+                    <div className="flex justify-between items-center px-2">
+                       <button 
+                          onClick={() => { setAudioURL(null); setFile(null); }}
+                          className={`text-zinc-500 hover:text-white transition-all text-[11px] font-bold uppercase tracking-[0.2em] py-2 border-b border-transparent hover:border-white/20 ${audioURL ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}
+                       >
+                          Discard Fragment
+                       </button>
+                       <button 
+                         onClick={handleAnalyze}
+                         disabled={!audioURL}
+                         className={`px-12 py-5 rounded-2xl flex items-center gap-4 tracking-[0.2em] font-extrabold font-syne uppercase transition-all shadow-[0_20px_50px_rgba(0,0,0,0.5)] ${
+                             audioURL ? "bg-white text-black hover:bg-cyan-400 hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] hover:scale-[1.02]" : "bg-zinc-800 text-zinc-600 cursor-not-allowed"
+                         }`}
+                       >
+                          Analyze <Zap size={20} />
+                       </button>
+                    </div>
+                 </div>
+              )}
 
              {viewState === 'processing' && (
-                <div className="flex flex-col h-full fade-in flex-1 items-center justify-center gap-10">
-                   {/* Massive Rotating Graphic */}
+                <div className="flex flex-col h-full fade-in flex-1 items-center justify-center gap-12">
                    <div className="relative">
-                      <div className="absolute inset-0 bg-pink-500/20 blur-2xl rounded-full scale-150 animate-pulse"></div>
-                      <svg width="0" height="0">
-                        <linearGradient id="glowGears" x1="0%" y1="0%" x2="100%" y2="100%">
-                          <stop stopColor="#ff3b30" offset="0%" />
-                          <stop stopColor="#9C27B0" offset="100%" />
-                        </linearGradient>
-                      </svg>
-                      <Mic size={100} className="text-transparent drop-shadow-[0_0_30px_rgba(255,0,85,0.8)] animate-[pulse_1s_linear_infinite]" style={{ stroke: 'url(#glowGears)' }} strokeWidth={1} />
+                      <div className="absolute inset-0 bg-rose-500/20 blur-3xl rounded-full scale-150 animate-pulse"></div>
+                      <Mic size={120} className="text-rose-400 drop-shadow-[0_0_40px_rgba(255,0,85,0.4)] animate-pulse" strokeWidth={1} />
                    </div>
                    
-                   <p className="animate-pulse tracking-[0.3em] text-pink-500 font-black font-outfit text-xl uppercase drop-shadow-[0_0_10px_rgba(255,0,85,0.6)]">
-                      Synthesizing Vocal Frequencies...
-                   </p>
+                   <div className="space-y-4 text-center">
+                      <p className="tracking-[0.4em] text-white font-extrabold font-syne text-xl uppercase italic">
+                         Extracting Prosody Maps
+                      </p>
+                      <div className="flex gap-3 justify-center">
+                         <div className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-bounce"></div>
+                         <div className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                         <div className="w-1.5 h-1.5 bg-rose-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                      </div>
+                   </div>
                 </div>
              )}
 
              {viewState === 'result' && result && (
-                <div className="flex flex-col h-full fade-in flex-1 justify-between">
+                <div className="flex flex-col h-full fade-in flex-1 font-jakarta">
                    {result.error ? (
-                     <div className="flex-1 flex flex-col items-center justify-center gap-6 text-center">
-                        <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center">
-                           <Zap size={40} className="text-red-400" />
+                     <div className="flex-1 flex flex-col items-center justify-center gap-8 text-center px-6">
+                        <div className="w-24 h-24 rounded-[2rem] bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shadow-2xl">
+                           <Zap size={48} />
                         </div>
-                        <h3 className="text-2xl font-black font-outfit text-red-400 uppercase tracking-widest">Analysis Failed</h3>
-                        <p className="text-slate-400 max-w-md text-sm leading-relaxed">{result.message}</p>
+                        <div className="space-y-3">
+                           <h3 className="text-3xl font-syne font-extrabold text-white uppercase tracking-tighter">Stream Malfunction</h3>
+                           <p className="text-zinc-500 max-w-sm text-sm leading-relaxed">{result.message}</p>
+                        </div>
                      </div>
                    ) : (
-                   <div>
-                       <div className="flex justify-between items-start mb-10 border-b border-white/10 pb-8">
+                   <div className="flex-1 flex flex-col">
+                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 border-b border-white/5 pb-10 gap-6">
                           <div>
-                            <h3 className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Primary Pitch Topology</h3>
-                            <div className="flex items-center gap-4">
-                              <h2 className="text-6xl font-black font-outfit text-white drop-shadow-lg uppercase tracking-tight">{result.emotion || 'Processing'}</h2>
+                            <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.3em] mb-4">Neural Signature</h3>
+                            <div className="flex items-center gap-6">
+                              <h2 className="text-7xl md:text-8xl font-extrabold font-syne text-white tracking-tighter uppercase">{result.emotion}</h2>
+                              <div className={`w-4 h-4 rounded-full ${getEmotionColor(result.emotion)} animate-pulse shadow-[0_0_15px_currentColor]`}></div>
                             </div>
                           </div>
                           
-                          <div className="text-right">
-                             <h3 className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Confidence Level</h3>
-                             <p className="text-4xl font-black text-white">{((result.confidence || 0) * 100).toFixed(1)}%</p>
+                          <div className="md:text-right pt-4 md:pt-0">
+                             <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.3em] mb-4">Spectral Match</h3>
+                             <p className="text-5xl md:text-6xl font-extrabold font-syne text-rose-400 tracking-tighter">{((result.confidence || 0) * 100).toFixed(1)}%</p>
                           </div>
                        </div>
                        
-                       <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.1em] mb-4">Underlying Emotion Tensor Vector</h3>
-                       <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                           {Object.entries((result.probabilities || result.breakdown || {})).sort((a,b)=>b[1]-a[1]).map(([emo, val]) => (
-                               <div key={emo} className="flex flex-col gap-2">
-                                  <div className="flex justify-between text-sm">
-                                      <span className="text-slate-300 font-bold uppercase tracking-widest">{emo}</span>
-                                      <span className="text-slate-400 font-bold">{(val * 100).toFixed(1)}%</span>
-                                  </div>
-                                  <div className="w-full bg-[#111111] rounded-full h-3 border border-white/5 shadow-inner overflow-hidden">
-                                      <div 
-                                        className={`h-full rounded-full transition-all duration-1000 ease-out ${getEmotionColor(emo)}`}
-                                        style={{ width: `${val * 100}%` }}
-                                      ></div>
-                                  </div>
-                               </div>
-                           ))}
+                       <div className="space-y-10 flex-1">
+                          <div>
+                             <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-8">Harmonic Distribution</h3>
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
+                                 {Object.entries((result.probabilities || result.breakdown || {})).sort((a,b)=>b[1]-a[1]).map(([emo, val]) => (
+                                     <div key={emo} className="flex flex-col gap-3 group">
+                                        <div className="flex justify-between items-end">
+                                            <span className="text-zinc-400 font-bold font-syne uppercase tracking-widest text-[11px] group-hover:text-white transition-all">{emo}</span>
+                                            <span className="text-zinc-500 font-bold text-xs">{(val * 100).toFixed(1)}%</span>
+                                        </div>
+                                        <div className="w-full bg-zinc-900 rounded-full h-1.5 overflow-hidden">
+                                            <div 
+                                              className={`h-full rounded-full transition-all duration-[2s] cubic-bezier(0.2, 1, 0.2, 1) ${getEmotionColor(emo)}`}
+                                              style={{ width: `${val * 100}%` }}
+                                            ></div>
+                                        </div>
+                                     </div>
+                                 ))}
+                             </div>
+                          </div>
+                       </div>
+
+                       <div className="mt-16 pt-10 border-t border-white/5 flex justify-start">
+                          <button 
+                             onClick={() => {
+                                setViewState('input');
+                                setResult(null);
+                                setAudioURL(null);
+                                setFile(null);
+                             }} 
+                             className="group flex items-center gap-4 text-white hover:text-rose-400 transition-all font-syne font-bold tracking-[0.2em] uppercase text-xs"
+                          >
+                             <div className="p-2 rounded-xl bg-white/5 group-hover:bg-rose-400 group-hover:text-black transition-all">
+                                <ArrowLeft size={16} />
+                             </div>
+                             Reset Audio Link
+                          </button>
                        </div>
                    </div>
                    )}
-
-                   <div className="flex justify-start mt-12 bg-black/20 p-6 rounded-3xl border border-white/5 backdrop-blur-md">
-                      <button 
-                         onClick={() => {
-                            setViewState('input');
-                            setResult(null);
-                            setAudioURL(null);
-                            setFile(null);
-                         }} 
-                         className="flex items-center gap-3 text-pink-500 hover:text-white transition-colors font-bold tracking-widest uppercase text-sm"
-                      >
-                         <ArrowLeft size={18} /> Record New Voice Sample
-                      </button>
-                   </div>
                 </div>
              )}
 

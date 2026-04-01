@@ -125,63 +125,64 @@ export default function ImageEmotion() {
 
   const getEmotionStyling = (emotion) => {
     const raw = emotion ? emotion.toLowerCase() : 'neutral';
-    if (raw.includes('happ') || raw.includes('joy') || raw.includes('excit')) return { borderColor: '#ccff00', bg: '#ccff00', text: '#000000', label: emotion }; 
-    if (raw.includes('sad')) return { borderColor: '#30B5FF', bg: '#30B5FF', text: '#ffffff', label: emotion }; 
-    if (raw.includes('angr') || raw.includes('furious')) return { borderColor: '#ff0055', bg: '#ff0055', text: '#ffffff', label: emotion }; 
-    if (raw.includes('fear') || raw.includes('scare')) return { borderColor: '#9C27B0', bg: '#9C27B0', text: '#ffffff', label: emotion }; 
-    if (raw.includes('surpris')) return { borderColor: '#00ffff', bg: '#00ffff', text: '#000000', label: emotion }; 
-    return { borderColor: '#ffffff', bg: '#ffffff', text: '#000000', label: emotion || 'Neutral' };
+    if (raw.includes('happ') || raw.includes('joy') || raw.includes('excit')) return { borderColor: 'var(--accent-vibrant-yellow)', bg: 'var(--accent-vibrant-yellow)', text: '#000000', label: emotion }; 
+    if (raw.includes('sad')) return { borderColor: 'var(--accent-primary)', bg: 'var(--accent-primary)', text: '#ffffff', label: emotion }; 
+    if (raw.includes('angr') || raw.includes('furious')) return { borderColor: 'var(--accent-secondary)', bg: 'var(--accent-secondary)', text: '#ffffff', label: emotion }; 
+    if (raw.includes('fear') || raw.includes('scare')) return { borderColor: '#a855f7', bg: '#a855f7', text: '#ffffff', label: emotion }; 
+    if (raw.includes('surpris')) return { borderColor: 'var(--accent-primary)', bg: 'var(--accent-primary)', text: '#000000', label: emotion }; 
+    return { borderColor: '#52525b', bg: '#52525b', text: '#ffffff', label: emotion || 'Neutral' };
   };
 
   return (
     <div className="flex flex-col gap-6 w-full max-w-5xl mx-auto pt-4">
-      <div className="flex items-center gap-4 mb-4 fade-in">
-        <div className="p-4 bg-amber-500/10 border border-amber-500/20 rounded-2xl shadow-[0_0_15px_rgba(0,0,0,0.5)]">
-          <Camera className="text-amber-400" size={32} />
+      <div className="flex items-center gap-6 mb-6 fade-in">
+        <div className="p-5 obsidian-panel border-white/10 bg-white/5 flex items-center justify-center text-amber-400 shadow-2xl">
+          <Camera size={36} />
         </div>
         <div>
-          <h2 className="text-3xl font-black font-outfit text-white tracking-wide">Real-Time Facial Optics</h2>
-          <p className="text-slate-400 text-sm font-bold tracking-widest uppercase mt-1">Live OpenCV DeepFace Matrix</p>
+          <h2 className="text-4xl font-extrabold font-syne text-white tracking-tight">Optical <span className="gradient-text text-amber-400">Sensors</span></h2>
+          <p className="text-zinc-500 text-[10px] font-bold tracking-[0.3em] uppercase mt-2">Neural Visual Matrix</p>
         </div>
       </div>
 
-      <div className="relative w-full min-h-[550px] rounded-[3rem] overflow-hidden shadow-[0_40px_100px_rgba(0,0,0,0.95)] transition-all duration-500 bg-[#080808] border border-white/10 flex flex-col justify-center items-center">
+      <div className="relative w-full rounded-[3rem] shadow-[0_45px_100px_rgba(0,0,0,0.95)] transition-all duration-700 bg-[#050505] border-t border-white/10 flex flex-col justify-center items-center overflow-hidden">
           
-          <canvas ref={canvasRef} className="hidden" />
+           <canvas ref={canvasRef} className="hidden" />
 
           {/* Glowing Animated Border for Processing State */}
           {viewState === 'processing' && (
              <>
-               <div className="absolute top-1/2 left-1/2 w-[200%] h-[200%] bg-[conic-gradient(transparent_0deg,transparent_270deg,#ffcc00_360deg)] animate-[spin_2s_linear_infinite] origin-center -translate-x-1/2 -translate-y-1/2 z-0"></div>
-               <div className="absolute inset-[2px] bg-[#111111]/95 rounded-[3rem] z-10 backdrop-blur-3xl"></div>
+               <div className="absolute top-1/2 left-1/2 w-[200%] h-[200%] bg-[conic-gradient(transparent_0deg,transparent_270deg,var(--accent-vibrant-yellow)_360deg)] animate-[spin_1s_linear_infinite] origin-center -translate-x-1/2 -translate-y-1/2 z-0 opacity-40"></div>
+               <div className="absolute inset-[1px] bg-[#050505] rounded-[3rem] z-10"></div>
              </>
           )}
 
           {/* Idle Screen UI - Dual Option (Live vs Upload) */}
           {viewState === 'idle' && (
-            <div className="relative z-20 flex flex-col items-center justify-center p-8 fade-in w-full text-center">
-               <div className="relative mb-10 w-full flex justify-center">
-                  <div className="absolute inset-0 bg-amber-500/10 blur-3xl rounded-full scale-150 animate-pulse"></div>
-                  <ScanFace size={96} className="text-amber-400 drop-shadow-[0_0_20px_rgba(255,204,0,0.5)]" strokeWidth={1} />
+            <div className="relative z-20 flex flex-col items-center justify-center p-12 fade-in w-full text-center font-jakarta">
+               <div className="relative mb-12">
+                  <div className="absolute inset-0 bg-amber-400/20 blur-[100px] rounded-full scale-150 animate-pulse"></div>
+                  <ScanFace size={120} className="text-amber-400 drop-shadow-[0_0_40px_rgba(252,238,10,0.4)]" strokeWidth={1} />
                </div>
                
-               <h3 className="text-3xl font-black font-outfit uppercase tracking-widest text-white mb-4">OPTICAL SENSOR SYSTEM</h3>
-               <p className="text-[#8e8e93] text-sm font-bold tracking-[0.1em] mb-12 max-w-xl leading-relaxed">
-                  ACTIVATE LIVE WEBCAM FOR REAL-TIME BOUNDING BOX OVERLAYS, OR UPLOAD A STATIC PICTURE FOR A PRECISE TENSOR EMOTION MAP.
-               </p>
-
-               <div className="flex flex-col sm:flex-row items-center justify-center gap-6 w-full">
+               <h3 className="text-sm font-bold font-syne uppercase tracking-[0.4em] text-zinc-500 mb-8 px-1">Optical Initialization Required</h3>
+               
+               <div className="flex flex-col sm:flex-row items-center justify-center gap-8 w-full max-w-2xl px-6">
                  <button 
                     onClick={startCamera}
-                    className="w-full sm:w-auto px-10 py-5 rounded-full flex items-center justify-center gap-4 tracking-widest font-black uppercase transition-all hover:scale-105 bg-amber-500 text-black shadow-[0_10px_40px_rgba(255,204,0,0.4)] hover:shadow-[0_15px_50px_rgba(255,204,0,0.6)]"
+                    className="group w-full sm:w-auto px-12 py-6 rounded-2xl flex items-center justify-center gap-5 tracking-[0.2em] font-extrabold font-syne uppercase transition-all shadow-2xl bg-white text-black hover:bg-amber-400 hover:shadow-[0_0_40px_rgba(252,238,10,0.4)] active:scale-95"
                  >
-                    <Activity size={24} /> ACTIVATE LIVE CAMERA
+                    <Activity size={24} /> Live stream
                  </button>
 
-                 <span className="text-white/20 font-black">OR</span>
+                 <div className="flex items-center gap-4 opacity-30">
+                    <div className="w-8 h-px bg-zinc-700"></div>
+                    <span className="text-[10px] font-bold text-zinc-600 tracking-widest uppercase">OR</span>
+                    <div className="w-8 h-px bg-zinc-700"></div>
+                 </div>
 
-                 <label className="w-full sm:w-auto px-10 py-5 rounded-full flex items-center justify-center gap-4 tracking-widest font-bold uppercase transition-all hover:scale-105 bg-white/5 hover:bg-white/10 text-white border border-white/10 cursor-pointer shadow-lg">
-                    <Upload size={20} /> UPLOAD PICTURE
+                 <label className="group/btn w-full sm:w-auto px-12 py-6 rounded-2xl flex items-center justify-center gap-5 tracking-[0.2em] font-extrabold font-syne uppercase transition-all bg-zinc-900 border border-white/5 text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer shadow-2xl active:scale-95">
+                    <Upload size={24} className="group-hover/btn:text-white transition-colors" /> Import
                     <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
                  </label>
                </div>
@@ -190,25 +191,25 @@ export default function ImageEmotion() {
 
           {/* Photo Preview Mode */}
           {viewState === 'preview' && imageURL && (
-            <div className="relative z-20 flex flex-col items-center justify-center p-8 md:p-12 w-full h-full fade-in flex-1">
-               <h3 className="text-2xl font-black font-outfit uppercase tracking-widest text-white mb-6 drop-shadow-lg w-full text-left">STATIC IMAGE SCANNED</h3>
+            <div className="relative z-20 flex flex-col items-center justify-center p-10 md:p-16 w-full h-full fade-in flex-1 font-jakarta">
+               <h3 className="text-[10px] font-bold font-syne uppercase tracking-[0.4em] text-zinc-500 mb-8 w-full text-left">Static Image Import</h3>
                
-               <div className="w-full flex-1 flex items-center justify-center p-4 bg-[#111111]/80 border border-white/5 rounded-2xl mb-6 relative overflow-hidden min-h-[300px]">
-                  <img src={imageURL} alt="Upload" className="max-h-full max-w-full rounded-xl object-contain drop-shadow-2xl" />
+               <div className="w-full flex-1 flex items-center justify-center p-6 bg-white/5 border border-white/5 rounded-[2.5rem] mb-10 relative overflow-hidden min-h-[350px] shadow-2xl">
+                  <img src={imageURL} alt="Upload" className="max-h-full max-w-full rounded-2xl object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]" />
                </div>
                
-               <div className="flex justify-between items-center w-full">
+               <div className="flex justify-between items-center w-full px-2">
                   <button 
                      onClick={() => { setImageURL(null); setFile(null); setViewState('idle'); }}
-                     className="text-slate-500 hover:text-white transition-colors text-sm font-bold uppercase tracking-widest"
+                     className="text-zinc-500 hover:text-white transition-all text-xs font-bold uppercase tracking-[0.2em] py-2 border-b border-transparent hover:border-white/20"
                   >
-                     Discard Photo
+                     Discard stream
                   </button>
                   <button 
                     onClick={handleAnalyzePhoto}
-                    className="px-8 py-5 rounded-full flex items-center gap-3 tracking-widest font-bold uppercase transition-all bg-amber-500/15 hover:bg-amber-500/30 border border-amber-500/40 border-t-amber-500/80 shadow-[0_10px_30px_rgba(255,204,0,0.3)] hover:shadow-[0_15px_40px_rgba(255,204,0,0.5)] hover:scale-105 text-white"
+                    className="px-12 py-5 rounded-2xl flex items-center gap-4 tracking-[0.2em] font-extrabold font-syne uppercase transition-all bg-white text-black hover:bg-amber-400 hover:shadow-[0_0_30px_rgba(252,238,10,0.4)] hover:scale-[1.02] shadow-2xl"
                   >
-                     <Zap size={20} /> ANALYZE EMOTION
+                     Analyze <Zap size={20} />
                   </button>
                </div>
             </div>
@@ -216,73 +217,90 @@ export default function ImageEmotion() {
 
           {/* Processing Photo Overlay */}
           {viewState === 'processing' && (
-            <div className="flex flex-col h-full fade-in flex-1 items-center justify-center gap-10 z-20 py-20">
+            <div className="flex flex-col h-full fade-in flex-1 items-center justify-center gap-12 z-20 py-20">
                <div className="relative">
-                  <div className="absolute inset-0 bg-amber-500/20 blur-2xl rounded-full scale-150 animate-pulse"></div>
-                  <ScanFace size={100} className="text-amber-400 drop-shadow-[0_0_30px_rgba(255,204,0,0.8)] animate-[pulse_1s_linear_infinite]" strokeWidth={1} />
+                  <div className="absolute inset-0 bg-amber-400/20 blur-[100px] rounded-full scale-150 animate-pulse"></div>
+                  <ScanFace size={130} className="text-amber-400 drop-shadow-[0_0_50px_rgba(252,238,10,0.5)] animate-pulse" strokeWidth={1} />
                </div>
-               <p className="animate-pulse tracking-[0.3em] text-amber-500 font-black font-outfit text-xl uppercase drop-shadow-[0_0_10px_rgba(255,204,0,0.6)]">
-                  Mapping Facial Topography...
-               </p>
+               <div className="space-y-4 text-center">
+                  <p className="tracking-[0.4em] text-white font-extrabold font-syne text-2xl uppercase italic">
+                     Neural Mapping
+                  </p>
+                  <div className="flex gap-3 justify-center">
+                     <div className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-bounce"></div>
+                     <div className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
+                     <div className="w-1.5 h-1.5 bg-amber-400 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
+                  </div>
+               </div>
             </div>
           )}
 
           {viewState === 'result' && globalResult && (
-            <div className="relative z-20 flex flex-col h-full fade-in flex-1 justify-between w-full p-8 md:p-12 min-h-[550px]">
+            <div className="relative z-20 flex flex-col fade-in flex-1 justify-between w-full p-10 md:p-16 font-jakarta">
                {globalResult.error ? (
-                 <div className="flex-1 flex flex-col items-center justify-center gap-6 text-center">
-                    <div className="w-20 h-20 rounded-full bg-red-500/10 border border-red-500/30 flex items-center justify-center">
-                       <Zap size={40} className="text-red-400" />
+                 <div className="flex-1 flex flex-col items-center justify-center gap-8 text-center px-10">
+                    <div className="w-24 h-24 rounded-[2rem] bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shadow-2xl">
+                       <Zap size={48} />
                     </div>
-                    <h3 className="text-2xl font-black font-outfit text-red-400 uppercase tracking-widest">Analysis Failed</h3>
-                    <p className="text-slate-400 max-w-md text-sm leading-relaxed">{globalResult.message}</p>
+                    <div className="space-y-3">
+                       <h3 className="text-3xl font-syne font-extrabold text-white uppercase tracking-tighter">Sensor Malfunction</h3>
+                       <p className="text-zinc-500 max-w-sm text-sm leading-relaxed">{globalResult.message}</p>
+                    </div>
                  </div>
                ) : (
-               <div>
-                   <div className="flex justify-between items-start mb-10 border-b border-white/10 pb-8">
+               <div className="flex-1 flex flex-col">
+                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 border-b border-white/5 pb-10 gap-8">
                       <div>
-                        <h3 className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Primary Micro-Expression</h3>
-                        <div className="flex items-center gap-4">
-                          <h2 className="text-6xl font-black font-outfit text-white drop-shadow-lg uppercase tracking-tight">{globalResult.emotion || 'Surprise'}</h2>
+                        <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.3em] mb-4">Neural Signature</h3>
+                        <div className="flex items-center gap-8">
+                          <h2 className="text-7xl md:text-8xl font-extrabold font-syne text-white tracking-tighter uppercase leading-none">{globalResult.emotion}</h2>
+                          <div className="w-5 h-5 rounded-full animate-pulse shadow-[0_0_20px_currentColor]" style={{ backgroundColor: getEmotionStyling(globalResult.emotion).bg, color: getEmotionStyling(globalResult.emotion).bg }}></div>
                         </div>
                       </div>
-                      <div className="text-right">
-                         <h3 className="text-sm font-bold text-slate-500 uppercase tracking-[0.2em] mb-2">Confidence Level</h3>
-                         <p className="text-4xl font-black text-white">{((globalResult.confidence || 0) * 100).toFixed(1)}%</p>
+                      <div className="md:text-right pt-4 md:pt-0">
+                         <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.3em] mb-4">Probability Match</h3>
+                         <p className="text-5xl md:text-6xl font-extrabold font-syne text-amber-400 tracking-tighter">{((globalResult.confidence || 0) * 100).toFixed(1)}%</p>
                       </div>
                    </div>
                    
-                   <h3 className="text-xs font-bold text-slate-500 uppercase tracking-[0.1em] mb-4">Underlying Emotion Tensor Vector</h3>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-6">
-                       {Object.entries((globalResult.probabilities || globalResult.breakdown || {})).sort((a,b)=>b[1]-a[1]).map(([emo, val]) => {
-                           const st = getEmotionStyling(emo);
-                           return (
-                             <div key={emo} className="flex flex-col gap-2">
-                                <div className="flex justify-between text-sm">
-                                    <span className="text-slate-300 font-bold uppercase tracking-widest">{emo}</span>
-                                    <span className="text-slate-400 font-bold">{(val * 100).toFixed(1)}%</span>
-                                </div>
-                                <div className="w-full bg-[#111111] rounded-full h-3 border border-white/5 shadow-inner overflow-hidden">
-                                    <div 
-                                      className="h-full rounded-full transition-all duration-1000 ease-out"
-                                      style={{ width: `${val * 100}%`, backgroundColor: st.bg, boxShadow: `0 0 15px ${st.bg}` }}
-                                    ></div>
-                                </div>
-                             </div>
-                           );
-                       })}
+                   <div className="space-y-12 flex-1">
+                      <div>
+                         <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-8">Intensity Distribution</h3>
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
+                             {Object.entries((globalResult.probabilities || globalResult.breakdown || {})).sort((a,b)=>b[1]-a[1]).map(([emo, val]) => {
+                                 const st = getEmotionStyling(emo);
+                                 return (
+                                   <div key={emo} className="flex flex-col gap-3 group">
+                                      <div className="flex justify-between items-end">
+                                          <span className="text-zinc-400 font-bold font-syne uppercase tracking-widest text-[11px] group-hover:text-white transition-all">{emo}</span>
+                                          <span className="text-zinc-500 font-bold text-xs">{(val * 100).toFixed(1)}%</span>
+                                      </div>
+                                      <div className="w-full bg-zinc-900 rounded-full h-1.5 overflow-hidden">
+                                          <div 
+                                            className="h-full rounded-full transition-all duration-[2s] cubic-bezier(0.19, 1, 0.22, 1)"
+                                            style={{ width: `${val * 100}%`, backgroundColor: st.bg, boxShadow: `0 0 10px ${st.bg}44` }}
+                                          ></div>
+                                      </div>
+                                   </div>
+                                 );
+                             })}
+                         </div>
+                      </div>
+                   </div>
+
+                   <div className="mt-16 pt-10 border-t border-white/5 flex justify-start">
+                      <button 
+                         onClick={() => { setViewState('idle'); setGlobalResult(null); setImageURL(null); setFile(null); }} 
+                         className="group flex items-center gap-5 text-white hover:text-amber-400 transition-all font-syne font-bold tracking-[0.2em] uppercase text-xs"
+                      >
+                         <div className="p-2 rounded-xl bg-white/5 group-hover:bg-amber-400 group-hover:text-black transition-all">
+                            <ArrowLeft size={16} />
+                         </div>
+                         Initialize New stream
+                      </button>
                    </div>
                </div>
                )}
-
-               <div className="flex justify-start mt-12 bg-black/20 p-6 rounded-3xl border border-white/5 backdrop-blur-md">
-                  <button 
-                     onClick={() => { setViewState('idle'); setGlobalResult(null); setImageURL(null); setFile(null); }} 
-                     className="flex items-center gap-3 text-amber-500 hover:text-white transition-colors font-bold tracking-widest uppercase text-sm"
-                  >
-                     <ArrowLeft size={18} /> Run New Visual Sequence
-                  </button>
-               </div>
             </div>
           )}
 
@@ -334,12 +352,12 @@ export default function ImageEmotion() {
       </div>
 
       {viewState === 'live' && (
-        <div className="flex justify-center mt-2 fade-in relative z-50">
+        <div className="flex justify-center mt-6 fade-in relative z-50">
            <button 
               onClick={stopCamera}
-              className="px-8 py-4 rounded-full flex items-center gap-3 tracking-widest font-bold uppercase transition-all bg-red-500/20 text-red-500 hover:bg-red-500 hover:text-white border border-red-500/50 hover:shadow-[0_0_30px_rgba(255,0,0,0.5)]"
+              className="px-10 py-5 rounded-2xl flex items-center gap-4 tracking-[0.2em] font-extrabold font-syne uppercase transition-all bg-rose-500/10 text-rose-500 hover:bg-rose-500 hover:text-white border border-rose-500/20 hover:shadow-[0_0_40px_rgba(255,0,85,0.4)] active:scale-95"
            >
-              <StopCircle size={20} /> TERMINATE CAMERA
+              <StopCircle size={24} /> Terminate stream
            </button>
         </div>
       )}

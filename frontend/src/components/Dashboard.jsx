@@ -31,14 +31,19 @@ export default function Dashboard() {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-[#1c1c1e]/80 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-2xl">
-          <p className="text-white font-bold mb-2">{label}</p>
-          {payload.map((entry, index) => (
-            <div key={index} className="flex justify-between gap-6 text-sm mb-1">
-              <span style={{ color: entry.color }}>{entry.name}</span>
-              <span className="text-white font-bold">{entry.value}</span>
-            </div>
-          ))}
+        <div className="obsidian-panel p-4 shadow-2xl border-t-white/10 !bg-[#0a0a0a]/90 backdrop-blur-xl">
+          <p className="text-white font-syne font-bold mb-3 tracking-tighter text-lg">{label}</p>
+          <div className="space-y-2">
+            {payload.map((entry, index) => (
+              <div key={index} className="flex justify-between items-center gap-8 text-xs font-jakarta">
+                <span className="flex items-center gap-2">
+                   <div className="w-2 h-2 rounded-full" style={{ backgroundColor: entry.color }}></div>
+                   <span className="text-zinc-400 font-medium">{entry.name}</span>
+                </span>
+                <span className="text-white font-bold">{entry.value}</span>
+              </div>
+            ))}
+          </div>
         </div>
       );
     }
@@ -87,118 +92,130 @@ export default function Dashboard() {
   });
 
   const emotionColors = {
-    Happy: '#34c759', Sad: '#30B5FF', Angry: '#ff0055', Neutral: '#8e8e93',
-    Fear: '#9C27B0', Surprise: '#ffcc00', Disgust: '#10b981', Joy: '#34c759',
-    Unknown: '#555'
+    Happy: 'var(--accent-vibrant-yellow)', 
+    Sad: 'var(--accent-primary)', 
+    Angry: 'var(--accent-secondary)', 
+    Neutral: '#52525b',
+    Fear: '#a855f7', 
+    Surprise: '#fb923c', 
+    Disgust: '#10b981', 
+    Joy: 'var(--accent-vibrant-yellow)',
+    Unknown: '#3f3f46'
   };
 
   return (
     <div className="flex flex-col gap-6 w-full fade-in p-4 xl:p-8 max-w-7xl mx-auto">
       
       {/* Primary Area Chart */}
-      <div className="glass-panel p-6 pb-2 pt-10 rounded-[2rem] w-full min-h-[400px] border border-white/5 bg-[#18181a] shadow-2xl relative">
+      <div className="obsidian-panel p-8 md:p-10 pb-4 rounded-[2.5rem] w-full min-h-[450px] border-t-white/10 shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-100 transition-opacity">
+              <ArrowUpRight className="text-zinc-600" size={32} />
+          </div>
           {analytics.emotion_timeseries.length > 0 ? (
-          <ResponsiveContainer width="100%" height="100%" minHeight={350}>
-            <AreaChart data={analytics.emotion_timeseries} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+          <ResponsiveContainer width="100%" height="100%" minHeight={380}>
+            <AreaChart data={analytics.emotion_timeseries} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
               <defs>
                 {[...emotionKeys].map(emo => (
                   <linearGradient key={emo} id={`color${emo}`} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={emotionColors[emo] || '#888'} stopOpacity={0.7}/>
+                    <stop offset="5%" stopColor={emotionColors[emo] || '#888'} stopOpacity={0.4}/>
                     <stop offset="95%" stopColor={emotionColors[emo] || '#888'} stopOpacity={0}/>
                   </linearGradient>
                 ))}
               </defs>
-              <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#8e8e93', fontSize: 11}} dy={15} />
-              <YAxis axisLine={false} tickLine={false} tick={{fill: '#8e8e93', fontSize: 11}} dx={-10} />
-              <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} content={<CustomTooltip />} />
+              <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#52525b', fontSize: 11, fontWeight: 'bold'}} dy={15} />
+              <YAxis axisLine={false} tickLine={false} tick={{fill: '#52525b', fontSize: 11, fontWeight: 'bold'}} dx={-10} />
+              <Tooltip cursor={{ stroke: 'rgba(255,255,255,0.1)', strokeWidth: 1 }} content={<CustomTooltip />} />
               {[...emotionKeys].map(emo => (
-                <Area key={emo} type="monotone" dataKey={emo} stroke={emotionColors[emo] || '#888'} strokeWidth={3} fillOpacity={1} fill={`url(#color${emo})`} />
+                <Area key={emo} type="monotone" dataKey={emo} stroke={emotionColors[emo] || '#888'} strokeWidth={4} fillOpacity={1} fill={`url(#color${emo})`} isAnimationActive={true} animationDuration={1500} />
               ))}
             </AreaChart>
           </ResponsiveContainer>
           ) : (
-            <div className="flex items-center justify-center h-[350px] text-slate-500 text-sm font-bold tracking-widest uppercase">
-              Chart populates as you run analyses
+            <div className="flex items-center justify-center h-[380px] text-zinc-600 text-xs font-bold tracking-[0.2em] uppercase">
+              Perception metrics pending analysis...
             </div>
           )}
       </div>
 
-      {/* Triplet Mini-Cards Row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-2">
         
         {/* Total Inferences */}
-        <div className="glass-panel p-6 bg-[#18181a] border border-white/5 rounded-[2rem] flex flex-col justify-between h-[180px] shadow-xl hover:bg-white/5 transition-all cursor-crosshair">
-           <div className="flex items-center gap-3">
-              <span className="text-slate-400 text-sm font-inter">Total Inferences</span>
-              <span className="text-[#34c759] text-xs font-bold flex items-center gap-1"><ArrowUpRight size={14}/> Live</span>
-           </div>
-           <div className="flex justify-between items-end mt-4">
-              <h3 className="text-4xl font-outfit text-white tracking-wide font-medium">{analytics.total_inferences.toLocaleString()}</h3>
-              <div className="w-[120px] h-[60px]">
-                  {analytics.inference_history.length > 1 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                     <AreaChart data={analytics.inference_history}>
-                        <defs>
-                           <linearGradient id="spark1" x1="0" y1="0" x2="0" y2="1">
-                             <stop offset="5%" stopColor="#d1359c" stopOpacity={0.6}/>
-                             <stop offset="95%" stopColor="#d1359c" stopOpacity={0}/>
-                           </linearGradient>
-                        </defs>
-                        <Area type="monotone" dataKey="val" stroke="#d1359c" strokeWidth={2} fillOpacity={1} fill="url(#spark1)" dot={false} isAnimationActive={true} />
-                     </AreaChart>
-                  </ResponsiveContainer>
-                  ) : <div className="w-full h-full flex items-center justify-center text-slate-600 text-[10px]">—</div>}
+        <div className="obsidian-panel p-8 bg-[#0a0a0a] border-t-white/10 rounded-[2.5rem] flex flex-col justify-between h-[220px] shadow-2xl hover:bg-white/5 transition-all group">
+           <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                 <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold">Total Inferences</span>
+                 <h3 className="text-5xl font-syne text-white tracking-tighter font-extrabold">{analytics.total_inferences.toLocaleString()}</h3>
               </div>
+              <div className="px-3 py-1 bg-emerald-500/10 rounded-full text-emerald-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
+                  <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></div> Up
+              </div>
+           </div>
+           <div className="w-full h-[60px] opacity-40 group-hover:opacity-80 transition-opacity">
+               {analytics.inference_history.length > 1 ? (
+               <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={analytics.inference_history}>
+                     <defs>
+                        <linearGradient id="spark1" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="var(--accent-secondary)" stopOpacity={0.6}/>
+                          <stop offset="95%" stopColor="var(--accent-secondary)" stopOpacity={0}/>
+                        </linearGradient>
+                     </defs>
+                     <Area type="monotone" dataKey="val" stroke="var(--accent-secondary)" strokeWidth={3} fillOpacity={1} fill="url(#spark1)" dot={false} />
+                  </AreaChart>
+               </ResponsiveContainer>
+               ) : <div className="w-full h-full flex items-center justify-center text-zinc-700 text-[10px]">—</div>}
            </div>
         </div>
 
         {/* Avg Confidence */}
-        <div className="glass-panel p-6 bg-[#18181a] border border-white/5 rounded-[2rem] flex flex-col justify-between h-[180px] shadow-xl hover:bg-white/5 transition-all cursor-crosshair">
-           <div className="flex items-center gap-3">
-              <span className="text-slate-400 text-sm font-inter">Avg Confidence</span>
-              <span className="text-[#34c759] text-xs font-bold flex items-center gap-1"><ArrowUpRight size={14}/> Live</span>
-           </div>
-           <div className="flex justify-between items-end mt-4">
-              <h3 className="text-4xl font-outfit text-white tracking-wide font-medium">{analytics.avg_confidence}%</h3>
-              <div className="w-[120px] h-[60px]">
-                  {analytics.confidence_history.length > 1 ? (
-                  <ResponsiveContainer width="100%" height="100%">
-                     <AreaChart data={analytics.confidence_history}>
-                        <defs>
-                           <linearGradient id="spark2" x1="0" y1="0" x2="0" y2="1">
-                             <stop offset="5%" stopColor="#30B5FF" stopOpacity={0.6}/>
-                             <stop offset="95%" stopColor="#30B5FF" stopOpacity={0}/>
-                           </linearGradient>
-                        </defs>
-                        <Area type="monotone" dataKey="val" stroke="#30B5FF" strokeWidth={2} fillOpacity={1} fill="url(#spark2)" dot={false} isAnimationActive={true} />
-                     </AreaChart>
-                  </ResponsiveContainer>
-                  ) : <div className="w-full h-full flex items-center justify-center text-slate-600 text-[10px]">—</div>}
+        <div className="obsidian-panel p-8 bg-[#0a0a0a] border-t-white/10 rounded-[2.5rem] flex flex-col justify-between h-[220px] shadow-2xl hover:bg-white/5 transition-all group">
+           <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                 <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold">Avg Confidence</span>
+                 <h3 className="text-5xl font-syne text-white tracking-tighter font-extrabold">{analytics.avg_confidence}%</h3>
               </div>
+              <div className="px-3 py-1 bg-cyan-500/10 rounded-full text-cyan-400 text-[10px] font-bold uppercase tracking-widest">
+                  Stable
+              </div>
+           </div>
+           <div className="w-full h-[60px] opacity-40 group-hover:opacity-80 transition-opacity">
+               {analytics.confidence_history.length > 1 ? (
+               <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={analytics.confidence_history}>
+                     <defs>
+                        <linearGradient id="spark2" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="5%" stopColor="var(--accent-primary)" stopOpacity={0.6}/>
+                          <stop offset="95%" stopColor="var(--accent-primary)" stopOpacity={0}/>
+                        </linearGradient>
+                     </defs>
+                     <Area type="monotone" dataKey="val" stroke="var(--accent-primary)" strokeWidth={3} fillOpacity={1} fill="url(#spark2)" dot={false} />
+                  </AreaChart>
+               </ResponsiveContainer>
+               ) : <div className="w-full h-full flex items-center justify-center text-zinc-700 text-[10px]">—</div>}
            </div>
         </div>
 
-        {/* Activity Volume */}
-        <div className="glass-panel p-6 bg-[#18181a] border border-white/5 rounded-[2rem] flex flex-col justify-between h-[180px] shadow-xl hover:bg-white/5 transition-all cursor-crosshair relative">
-           <div className="flex justify-between items-center w-full mb-2">
-              <span className="text-slate-400 text-sm font-inter">System Activity</span>
-              <span className="text-[10px] text-slate-500 font-bold uppercase">This Week</span>
+        {/* Activity Distribution */}
+        <div className="obsidian-panel p-8 bg-[#0a0a0a] border-t-white/10 rounded-[2.5rem] flex flex-col justify-between h-[220px] shadow-2xl hover:bg-white/5 transition-all relative overflow-hidden">
+           <div className="flex justify-between items-center w-full mb-4">
+              <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold">Weekly Distribution</span>
            </div>
            <div className="flex-1 w-full flex items-end">
                <ResponsiveContainer width="100%" height="90%">
-                 <BarChart data={analytics.activity_by_day} margin={{top: 10, right: 0, left: 0, bottom: 0}} barSize={12}>
+                 <BarChart data={analytics.activity_by_day} margin={{top: 0, right: 0, left: 0, bottom: 0}} barSize={14}>
                    <defs>
                      <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                       <stop offset="0%" stopColor="#ff0055" stopOpacity={0.8}/>
-                       <stop offset="100%" stopColor="#30B5FF" stopOpacity={0.8}/>
+                       <stop offset="0%" stopColor="var(--accent-primary)" stopOpacity={1}/>
+                       <stop offset="100%" stopColor="var(--accent-secondary)" stopOpacity={0.8}/>
                      </linearGradient>
                    </defs>
-                   <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#8e8e93', fontSize: 10}} dy={10} />
-                   <Tooltip cursor={{ fill: 'rgba(255,255,255,0.05)' }} contentStyle={{ backgroundColor: 'rgba(28,28,30,0.9)', border: 'none', borderRadius: '8px', color: '#fff', fontSize: '12px' }} />
-                   <Bar dataKey="v" radius={[6, 6, 6, 6]}>
+                   <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{fill: '#52525b', fontSize: 10, fontWeight: 'bold'}} dy={10} />
+                   <Tooltip cursor={{ fill: 'rgba(255,255,255,0.03)' }} contentStyle={{ backgroundColor: 'rgba(10,10,10,0.95)', border: 'none', borderRadius: '12px', boxShadow: '0 10px 30px rgba(0,0,0,0.5)', color: '#fff', fontSize: '10px', fontBold: true }} />
+                   <Bar dataKey="v" radius={[4, 4, 4, 4]}>
                       {(analytics.activity_by_day || []).map((entry, index) => {
                         const maxVal = Math.max(...(analytics.activity_by_day || []).map(d => d.v));
-                        return <Cell key={`cell-${index}`} fill={entry.v === maxVal && entry.v > 0 ? "url(#barGradient)" : "#2c2c2e"} />;
+                        return <Cell key={`cell-${index}`} fill={entry.v === maxVal && entry.v > 0 ? "url(#barGradient)" : "#27272a"} />;
                       })}
                    </Bar>
                  </BarChart>

@@ -4,13 +4,26 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>EmotiCore | Deciphering Human Emotion</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
+            fontFamily: {
+              syne: ['Syne', 'sans-serif'],
+              jakarta: ['Plus Jakarta Sans', 'sans-serif'],
+            },
             colors: {
+              obsidian: {
+                DEFAULT: '#050505',
+                surface: '#0a0a0a',
+                border: 'rgba(255, 255, 255, 0.1)',
+                'border-bright': 'rgba(255, 255, 255, 0.2)',
+              },
               indigo: { 400: '#00f3ff', 500: '#00a3cc', 600: '#007799' },
               pink: { 400: '#ff0055', 500: '#cc0044', 600: '#990033' },
               amber: { 400: '#fcee0a', 500: '#cca300' },
