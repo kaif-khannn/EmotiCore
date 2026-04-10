@@ -185,11 +185,19 @@ export default function TextEmotion({ onReturnHome }) {
                         </div>
 
                         {/* Reinforcement Feedback Section */}
-                        <div className="mt-12 p-8 rounded-3xl bg-white/[0.02] border border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 shadow-inner">
+                        <div className="mt-12 p-8 rounded-3xl bg-white/[0.02] border border-white/5 flex flex-col items-center gap-8 shadow-inner">
                            {feedbackStatus === 'submitted' ? (
-                              <div className="flex items-center gap-4 text-emerald-400 font-syne font-bold uppercase tracking-[0.2em] text-xs">
-                                 <Activity size={20} className="animate-pulse" />
-                                 Neural Pattern Adjusted. Thank you for the correction.
+                              <div className="flex flex-col items-center gap-6 w-full fade-in">
+                                 <div className="flex items-center gap-4 text-emerald-400 font-syne font-bold uppercase tracking-[0.2em] text-xs">
+                                    <Activity size={20} className="animate-pulse" />
+                                    Neural Pattern Adjusted. Thank you.
+                                 </div>
+                                 <button 
+                                    onClick={() => { setViewState('input'); setResult(null); setFeedbackStatus(null); setText(''); }}
+                                    className="px-10 py-4 bg-white text-black rounded-2xl font-syne font-black uppercase tracking-widest hover:bg-cyan-400 transition-all hover:scale-105 shadow-2xl flex items-center gap-3"
+                                 >
+                                    Analyze Another Text <Zap size={18} />
+                                 </button>
                               </div>
                            ) : feedbackStatus === 'incorrect' ? (
                               <div className="flex flex-col md:flex-row items-center gap-6 w-full">
@@ -208,7 +216,7 @@ export default function TextEmotion({ onReturnHome }) {
                                  <button onClick={() => setFeedbackStatus(null)} className="text-zinc-600 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest underline underline-offset-4">Cancel</button>
                               </div>
                            ) : (
-                              <>
+                              <div className="flex flex-col md:flex-row items-center justify-between gap-6 w-full">
                                  <div className="flex flex-col gap-1">
                                     <h4 className="text-white font-bold font-syne tracking-widest uppercase text-xs">Is this prediction accurate?</h4>
                                     <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-[0.1em]">Help refine our neural heuristics</p>
@@ -227,7 +235,7 @@ export default function TextEmotion({ onReturnHome }) {
                                        Incorrect
                                     </button>
                                  </div>
-                              </>
+                              </div>
                            )}
                         </div>
 

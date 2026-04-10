@@ -11,21 +11,8 @@ import LandingPage from './components/LandingPage';
 
 function App() {
   // Load initial state from localStorage to prevent reset on reload
-  const [activeModule, setActiveModule] = useState(() => {
-    return localStorage.getItem('emoticore_activeModule') || 'home';
-  });
-  const [hasStarted, setHasStarted] = useState(() => {
-    return localStorage.getItem('emoticore_hasStarted') === 'true';
-  });
-
-  // Save state to localStorage whenever it changes
-  React.useEffect(() => {
-    localStorage.setItem('emoticore_activeModule', activeModule);
-  }, [activeModule]);
-
-  React.useEffect(() => {
-    localStorage.setItem('emoticore_hasStarted', hasStarted.toString());
-  }, [hasStarted]);
+  const [activeModule, setActiveModule] = useState('home');
+  const [hasStarted, setHasStarted] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
