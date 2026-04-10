@@ -3,12 +3,26 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any
 
 from models.text_model import predict_text_emotion
-from models.audio_model import predict_audio_emotion
-from models.image_model import predict_image_emotion
+from models.audio_model import predict_audio_emotion, get_status as get_audio_status
+from models.image_model import predict_image_emotion, get_status as get_image_status
 from models.fusion import aggregate_predictions
 from models.analytics_store import log_inference, get_analytics
+from utils.serialization import to_python_types
+
+from routes.feedback import router as feedback_router
 
 router = APIRouter()
+router.include_router(feedback_router)
+
+@router.get("/health-check")
+async def get_system_status():
+    """Return the status of the underlying emotion recognition models."""
+    print("DEBUG: /api/health-check hit")
+    return {
+        "audio": get_audio_status(),
+        "image": get_image_status(),
+        "system": "Operational"
+    }
 
 class TextInput(BaseModel):
     text: str
@@ -18,8 +32,8 @@ async def predict_text(input_data: TextInput):
     """Predict emotion from provided text."""
     result = predict_text_emotion(input_data.text)
     if "error" not in result:
-        log_inference("text", result.get("emotion", "Unknown"), result.get("confidence", 0))
-    return result
+        log_inference("text", result.get("emotion", "Unknown"), float(result.get("confidence", 0)))
+    return to_python_types(result)
 
 @router.post("/predict/audio")
 async def predict_audio(file: UploadFile = File(...)):
@@ -27,8 +41,8 @@ async def predict_audio(file: UploadFile = File(...)):
     audio_bytes = await file.read()
     result = predict_audio_emotion(audio_bytes)
     if "error" not in result:
-        log_inference("audio", result.get("emotion", "Unknown"), result.get("confidence", 0))
-    return result
+        log_inference("audio", result.get("emotion", "Unknown"), float(result.get("confidence", 0)))
+    return to_python_types(result)
 
 @router.post("/predict/image")
 async def predict_image(file: UploadFile = File(...)):
@@ -37,9 +51,9 @@ async def predict_image(file: UploadFile = File(...)):
     result = predict_image_emotion(image_bytes)
     if "error" not in result:
         emotion = result.get("emotion", "Unknown")
-        confidence = result.get("confidence", 0)
+        confidence = float(result.get("confidence", 0))
         log_inference("image", emotion, confidence)
-    return result
+    return to_python_types(result)
 
 @router.get("/analytics")
 async def analytics():
@@ -73,6 +87,6 @@ async def predict_fusion(
 
     fused_result = aggregate_predictions(predictions)
     if "error" not in fused_result:
-        log_inference("fusion", fused_result.get("emotion", "Unknown"), fused_result.get("confidence", 0))
-    return fused_result
+        log_inference("fusion", fused_result.get("emotion", "Unknown"), float(fused_result.get("confidence", 0)))
+    return to_python_types(fused_result)
 

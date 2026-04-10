@@ -1,9 +1,34 @@
+# ── API ──────────────────────────────────────────────────────────────────────
 fastapi
 uvicorn
-transformers
+python-multipart
+
+# ── ML frameworks ─────────────────────────────────────────────────────────────
 torch
+transformers
+tf-keras
+
+# ── Audio ─────────────────────────────────────────────────────────────────────
 librosa
+soundfile
+
+# ── Vision ────────────────────────────────────────────────────────────────────
 deepface
 opencv-python-headless
-python-multipart
-tf-keras
+
+# ── Data pipeline ─────────────────────────────────────────────────────────────
+pandas
+numpy
+scikit-learn
+imbalanced-learn
+tqdm
+
+# ── Visualization & reporting ─────────────────────────────────────────────────
+matplotlib
+seaborn
+
+# ── NLP utilities ─────────────────────────────────────────────────────────────
+nltk
+
+# ── Optional: HuggingFace datasets (GoEmotions download helper) ───────────────
+datasets

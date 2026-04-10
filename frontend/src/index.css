@@ -218,3 +218,22 @@ input:focus, textarea:focus {
 .emotion-fear { color: #ff00ff; } 
 .emotion-surprise { color: #ffff00; } 
 .emotion-disgust { color: #88ff00; }
+
+/* Custom Scrollbar for Glassmorphism Theme */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-deep);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-bright);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-primary);
+}

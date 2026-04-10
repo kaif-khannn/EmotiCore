@@ -1,13 +1,33 @@
 import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
-import { Camera, StopCircle, ScanFace, Activity, Upload, Image as ImageIcon, Zap, ArrowLeft } from 'lucide-react';
+import { Camera, StopCircle, ScanFace, Activity, Upload, Image as ImageIcon, Zap, ArrowLeft, Grid } from 'lucide-react';
 
-export default function ImageEmotion() {
+export default function ImageEmotion({ onReturnHome }) {
   const [viewState, setViewState] = useState('idle'); // 'idle', 'live', 'preview', 'processing', 'result'
   const [faces, setFaces] = useState([]); 
   const [imageURL, setImageURL] = useState(null);
   const [file, setFile] = useState(null);
   const [globalResult, setGlobalResult] = useState(null);
+  const [feedbackStatus, setFeedbackStatus] = useState(null);
+  const EMOTIONS = ["happy", "sad", "angry", "fear", "neutral", "surprise", "disgust"];
+
+  const handleFeedback = async (isCorrect, correction = null) => {
+    try {
+      await fetch('http://127.0.0.1:8000/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          modality: 'image',
+          predicted: globalResult.emotion.toLowerCase(),
+          corrected: isCorrect ? globalResult.emotion.toLowerCase() : correction.toLowerCase(),
+          raw_input: file ? file.name : "Camera Frame"
+        })
+      });
+      setFeedbackStatus('submitted');
+    } catch (error) {
+      console.error('Feedback submission failed:', error);
+    }
+  };
   
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -33,7 +53,7 @@ export default function ImageEmotion() {
         }
       }, 100);
 
-      analyzeInterval.current = setInterval(captureAndAnalyzeLive, 2000);
+      // Removed analyzeInterval for manual snapshot
     } catch (err) {
       console.error("Camera access error:", err);
       alert("Microphone/Camera access is blocked or unavailable. Ensure localhost permissions.");
@@ -52,10 +72,12 @@ export default function ImageEmotion() {
     streamRef.current = null;
   };
 
-  const captureAndAnalyzeLive = async () => {
+  const captureSnapshot = async () => {
     if (!videoRef.current || !canvasRef.current || !streamRef.current) return;
     const video = videoRef.current;
-    if (video.readyState !== 4) return; 
+    if (video.readyState < 2) return; 
+
+    setViewState('processing');
 
     const canvas = canvasRef.current;
     canvas.width = video.videoWidth;
@@ -65,29 +87,23 @@ export default function ImageEmotion() {
 
     canvas.toBlob(async (blob) => {
       if (!blob) return;
+      stopCamera(false); 
       const formData = new FormData();
       formData.append('file', blob, 'frame.jpg');
 
       try {
-        const response = await axios.post('http://localhost:8000/api/predict/image', formData, {
+        const response = await axios.post('http://127.0.0.1:8000/api/predict/image', formData, {
            headers: { 'Content-Type': 'multipart/form-data' }
         });
         const data = response.data;
         if (data.error) throw new Error(data.error);
         
-        let detectedFaces = [];
-        if (data.faces && Array.isArray(data.faces)) detectedFaces = data.faces; 
-        else if (data.emotion) {
-           detectedFaces = [{
-              emotion: data.emotion,
-              confidence: data.confidence || 0.9,
-              region: data.region || { x: canvas.width * 0.25, y: canvas.height * 0.2, w: canvas.width * 0.5, h: canvas.height * 0.6 }
-           }];
-        }
-        setFaces(detectedFaces);
+        setGlobalResult(data);
+        setTimeout(() => setViewState('result'), 1200);
       } catch (err) {
         console.error("Backend Error:", err);
-        setFaces([]);
+        setGlobalResult({ error: true, message: err.message || 'Backend unreachable. Ensure the server is running on port 8000.' });
+        setViewState('result');
       }
     }, 'image/jpeg', 0.8);
   };
@@ -109,7 +125,7 @@ export default function ImageEmotion() {
       const formData = new FormData();
       formData.append('file', file, 'upload.jpg');
 
-      const response = await axios.post('http://localhost:8000/api/predict/image', formData, {
+      const response = await axios.post('http://127.0.0.1:8000/api/predict/image', formData, {
          headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (response.data.error) throw new Error(response.data.error);
@@ -129,7 +145,8 @@ export default function ImageEmotion() {
     if (raw.includes('sad')) return { borderColor: 'var(--accent-primary)', bg: 'var(--accent-primary)', text: '#ffffff', label: emotion }; 
     if (raw.includes('angr') || raw.includes('furious')) return { borderColor: 'var(--accent-secondary)', bg: 'var(--accent-secondary)', text: '#ffffff', label: emotion }; 
     if (raw.includes('fear') || raw.includes('scare')) return { borderColor: '#a855f7', bg: '#a855f7', text: '#ffffff', label: emotion }; 
-    if (raw.includes('surpris')) return { borderColor: 'var(--accent-primary)', bg: 'var(--accent-primary)', text: '#000000', label: emotion }; 
+    if (raw.includes('surpris')) return { borderColor: '#fb923c', bg: '#fb923c', text: '#000000', label: emotion }; 
+    if (raw.includes('disgust')) return { borderColor: '#10b981', bg: '#10b981', text: '#ffffff', label: emotion };
     return { borderColor: '#52525b', bg: '#52525b', text: '#ffffff', label: emotion || 'Neutral' };
   };
 
@@ -145,7 +162,7 @@ export default function ImageEmotion() {
         </div>
       </div>
 
-      <div className="relative w-full rounded-[3rem] shadow-[0_45px_100px_rgba(0,0,0,0.95)] transition-all duration-700 bg-[#050505] border-t border-white/10 flex flex-col justify-center items-center overflow-hidden">
+      <div className="relative w-full rounded-[3rem] shadow-[0_45px_100px_rgba(0,0,0,0.95)] transition-all duration-700 bg-[#050505] border-t border-white/10 flex flex-col justify-center items-center overflow-hidden aspect-video min-h-[400px] md:min-h-[500px]">
           
            <canvas ref={canvasRef} className="hidden" />
 
@@ -165,24 +182,28 @@ export default function ImageEmotion() {
                   <ScanFace size={120} className="text-amber-400 drop-shadow-[0_0_40px_rgba(252,238,10,0.4)]" strokeWidth={1} />
                </div>
                
-               <h3 className="text-sm font-bold font-syne uppercase tracking-[0.4em] text-zinc-500 mb-8 px-1">Optical Initialization Required</h3>
+               <h3 className="text-[11px] font-bold font-jakarta uppercase tracking-[0.5em] text-zinc-600 mb-12 px-1">Optical Initialization Required</h3>
                
-               <div className="flex flex-col sm:flex-row items-center justify-center gap-8 w-full max-w-2xl px-6">
+               <div className="flex flex-col sm:flex-row items-center justify-center gap-10 w-full max-w-3xl px-6">
                  <button 
                     onClick={startCamera}
-                    className="group w-full sm:w-auto px-12 py-6 rounded-2xl flex items-center justify-center gap-5 tracking-[0.2em] font-extrabold font-syne uppercase transition-all shadow-2xl bg-white text-black hover:bg-amber-400 hover:shadow-[0_0_40px_rgba(252,238,10,0.4)] active:scale-95"
+                    className="group w-full sm:w-[240px] h-[120px] rounded-[1.8rem] flex items-center justify-center gap-6 transition-all shadow-2xl bg-[#121212] border border-white/10 text-white/80 hover:text-white hover:bg-zinc-900 active:scale-95"
                  >
-                    <Activity size={24} /> Live stream
+                    <Camera size={28} className="text-white/60 group-hover:text-white transition-colors" /> 
+                    <div className="flex flex-col items-start leading-tight">
+                       <span className="text-lg font-bold font-jakarta uppercase tracking-widest">Capture</span>
+                    </div>
                  </button>
 
-                 <div className="flex items-center gap-4 opacity-30">
-                    <div className="w-8 h-px bg-zinc-700"></div>
-                    <span className="text-[10px] font-bold text-zinc-600 tracking-widest uppercase">OR</span>
-                    <div className="w-8 h-px bg-zinc-700"></div>
+                 <div className="flex items-center gap-6 opacity-30 px-2 lg:px-6">
+                    <div className="w-12 h-[1px] bg-zinc-600"></div>
+                    <span className="text-[10px] font-bold text-zinc-500 tracking-[0.2em] uppercase">OR</span>
+                    <div className="w-12 h-[1px] bg-zinc-600"></div>
                  </div>
 
-                 <label className="group/btn w-full sm:w-auto px-12 py-6 rounded-2xl flex items-center justify-center gap-5 tracking-[0.2em] font-extrabold font-syne uppercase transition-all bg-zinc-900 border border-white/5 text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer shadow-2xl active:scale-95">
-                    <Upload size={24} className="group-hover/btn:text-white transition-colors" /> Import
+                 <label className="group/btn w-full sm:w-[240px] h-[120px] rounded-[1.8rem] flex items-center justify-center gap-6 transition-all bg-[#121212] border border-white/10 text-white/80 hover:text-white hover:bg-zinc-900 cursor-pointer shadow-2xl active:scale-95">
+                    <Upload size={28} className="text-white/60 group-hover/btn:text-white transition-colors" /> 
+                    <span className="text-lg font-bold font-jakarta uppercase tracking-widest">Import</span>
                     <input type="file" accept="image/*" className="hidden" onChange={handleFileUpload} />
                  </label>
                </div>
@@ -192,7 +213,7 @@ export default function ImageEmotion() {
           {/* Photo Preview Mode */}
           {viewState === 'preview' && imageURL && (
             <div className="relative z-20 flex flex-col items-center justify-center p-10 md:p-16 w-full h-full fade-in flex-1 font-jakarta">
-               <h3 className="text-[10px] font-bold font-syne uppercase tracking-[0.4em] text-zinc-500 mb-8 w-full text-left">Static Image Import</h3>
+                <h3 className="text-[10px] font-bold font-jakarta uppercase tracking-[0.2em] text-zinc-500 mb-8 w-full text-left">Static Image Import</h3>
                
                <div className="w-full flex-1 flex items-center justify-center p-6 bg-white/5 border border-white/5 rounded-[2.5rem] mb-10 relative overflow-hidden min-h-[350px] shadow-2xl">
                   <img src={imageURL} alt="Upload" className="max-h-full max-w-full rounded-2xl object-contain drop-shadow-[0_20px_50px_rgba(0,0,0,0.8)]" />
@@ -207,7 +228,7 @@ export default function ImageEmotion() {
                   </button>
                   <button 
                     onClick={handleAnalyzePhoto}
-                    className="px-12 py-5 rounded-2xl flex items-center gap-4 tracking-[0.2em] font-extrabold font-syne uppercase transition-all bg-white text-black hover:bg-amber-400 hover:shadow-[0_0_30px_rgba(252,238,10,0.4)] hover:scale-[1.02] shadow-2xl"
+                    className="px-12 py-5 rounded-2xl flex items-center gap-4 tracking-[0.1em] font-bold font-jakarta uppercase transition-all bg-white text-black hover:bg-amber-400 hover:shadow-[0_0_30px_rgba(252,238,10,0.4)] hover:scale-[1.02] shadow-2xl"
                   >
                      Analyze <Zap size={20} />
                   </button>
@@ -223,7 +244,7 @@ export default function ImageEmotion() {
                   <ScanFace size={130} className="text-amber-400 drop-shadow-[0_0_50px_rgba(252,238,10,0.5)] animate-pulse" strokeWidth={1} />
                </div>
                <div className="space-y-4 text-center">
-                  <p className="tracking-[0.4em] text-white font-extrabold font-syne text-2xl uppercase italic">
+                  <p className="tracking-[0.4em] text-white font-bold font-jakarta text-2xl uppercase italic">
                      Neural Mapping
                   </p>
                   <div className="flex gap-3 justify-center">
@@ -253,7 +274,7 @@ export default function ImageEmotion() {
                       <div>
                         <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.3em] mb-4">Neural Signature</h3>
                         <div className="flex items-center gap-8">
-                          <h2 className="text-7xl md:text-8xl font-extrabold font-syne text-white tracking-tighter uppercase leading-none">{globalResult.emotion}</h2>
+                          <h2 className="text-3xl md:text-5xl font-extrabold font-syne text-white tracking-tighter uppercase leading-none truncate">{globalResult.emotion}</h2>
                           <div className="w-5 h-5 rounded-full animate-pulse shadow-[0_0_20px_currentColor]" style={{ backgroundColor: getEmotionStyling(globalResult.emotion).bg, color: getEmotionStyling(globalResult.emotion).bg }}></div>
                         </div>
                       </div>
@@ -286,9 +307,56 @@ export default function ImageEmotion() {
                              })}
                          </div>
                       </div>
-                   </div>
+                    </div>
 
-                   <div className="mt-16 pt-10 border-t border-white/5 flex justify-start">
+                    {/* Reinforcement Feedback Section */}
+                    <div className="mt-12 p-8 rounded-3xl bg-white/[0.04] border border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 shadow-inner w-full">
+                      {feedbackStatus === 'submitted' ? (
+                        <div className="flex items-center gap-4 text-emerald-400 font-syne font-bold uppercase tracking-[0.2em] text-xs">
+                           <ScanFace size={20} className="animate-pulse" />
+                           Visual Matrix Adjusted. Thank you.
+                        </div>
+                      ) : feedbackStatus === 'incorrect' ? (
+                        <div className="flex flex-col md:flex-row items-center gap-6 w-full">
+                           <span className="text-zinc-500 font-bold uppercase tracking-widest text-[10px] shrink-0">Correct Emotion:</span>
+                           <div className="flex flex-wrap gap-2 flex-1">
+                              {EMOTIONS.filter(e => e !== globalResult.emotion.toLowerCase()).map(emo => (
+                                 <button 
+                                    key={emo}
+                                    onClick={() => handleFeedback(false, emo)}
+                                    className="px-4 py-2 rounded-full border border-white/10 text-[10px] font-bold uppercase tracking-wider text-zinc-400 hover:bg-white hover:text-black hover:border-white transition-all"
+                                 >
+                                    {emo}
+                                 </button>
+                              ))}
+                           </div>
+                           <button onClick={() => setFeedbackStatus(null)} className="text-zinc-600 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest underline underline-offset-4">Cancel</button>
+                        </div>
+                      ) : (
+                        <>
+                           <div className="flex flex-col gap-1">
+                              <h4 className="text-white font-bold font-syne tracking-widest uppercase text-xs">Is this visual prediction accurate?</h4>
+                              <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-[0.1em]">Help refine our convolutional kernels</p>
+                           </div>
+                           <div className="flex gap-4">
+                              <button 
+                                 onClick={() => handleFeedback(true)}
+                                 className="px-8 py-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500 hover:text-black transition-all font-bold text-[10px] uppercase tracking-widest"
+                              >
+                                 Correct
+                              </button>
+                              <button 
+                                 onClick={() => setFeedbackStatus('incorrect')}
+                                 className="px-8 py-3 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-black transition-all font-bold text-[10px] uppercase tracking-widest"
+                              >
+                                 Incorrect
+                              </button>
+                           </div>
+                        </>
+                      )}
+                    </div>
+
+                   <div className="mt-16 pt-10 border-t border-white/5 flex justify-between items-center">
                       <button 
                          onClick={() => { setViewState('idle'); setGlobalResult(null); setImageURL(null); setFile(null); }} 
                          className="group flex items-center gap-5 text-white hover:text-amber-400 transition-all font-syne font-bold tracking-[0.2em] uppercase text-xs"
@@ -298,6 +366,19 @@ export default function ImageEmotion() {
                          </div>
                          Initialize New stream
                       </button>
+
+                      {onReturnHome && (
+                          <button 
+                             onClick={onReturnHome}
+                             className="group flex items-center gap-4 text-zinc-500 hover:text-white transition-all font-syne font-bold tracking-[0.2em] uppercase text-xs"
+                          >
+                             <span className="hidden md:inline">Return to All Modules</span>
+                             <span className="md:hidden">Modules</span>
+                             <div className="p-2 rounded-lg bg-white/5 group-hover:bg-white group-hover:text-black transition-all">
+                                <Grid size={16} />
+                             </div>
+                          </button>
+                      )}
                    </div>
                </div>
                )}
@@ -312,41 +393,17 @@ export default function ImageEmotion() {
             playsInline 
             muted 
           />
-          {viewState === 'live' && faces.length > 0 && videoRef.current && (
-             <div className="absolute inset-0 z-20 pointer-events-none fade-in">
-                {faces.map((face, idx) => {
-                   const styleDef = getEmotionStyling(face.emotion);
-                   const videoWidth = videoRef.current.videoWidth || 640;
-                   const videoHeight = videoRef.current.videoHeight || 480;
-                   const left = (face.region.x / videoWidth) * 100;
-                   const top = (face.region.y / videoHeight) * 100;
-                   const width = (face.region.w / videoWidth) * 100;
-                   const height = (face.region.h / videoHeight) * 100;
-
-                   return (
-                      <div 
-                         key={idx} 
-                         className="absolute border-[3px] rounded-2xl transition-all duration-500 ease-out shadow-[0_0_30px_rgba(0,0,0,0.6)]"
-                         style={{ left: `${left}%`, top: `${top}%`, width: `${width}%`, height: `${height}%`, borderColor: styleDef.borderColor }}
-                      >
-                         <div 
-                            className="absolute -top-[20px] left-0 md:-left-[3px] px-3 py-1.5 rounded-t-xl flex items-center font-bold tracking-widest text-[10px] uppercase shadow-[0_4px_10px_rgba(0,0,0,0.5)] transition-colors overflow-hidden whitespace-nowrap"
-                            style={{ backgroundColor: styleDef.bg, color: styleDef.text }}
-                         >
-                            {styleDef.label} • Face {idx + 1}
-                         </div>
-                      </div>
-                   );
-                })}
-             </div>
-          )}
           {viewState === 'live' && (
             <div className="absolute inset-0 z-30 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:100%_4px] opacity-20 Mix-blend-overlay"></div>
           )}
           {viewState === 'live' && (
-            <div className="absolute top-6 left-1/2 -translate-x-1/2 z-40 bg-black/60 backdrop-blur-xl border border-white/10 px-6 py-2 rounded-full flex items-center gap-3 drop-shadow-xl fade-in">
-               <div className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse shadow-[0_0_8px_#34c759]"></div>
-               <span className="text-white font-bold text-xs uppercase tracking-[0.2em] whitespace-nowrap">{faces.length > 0 ? 'Emotions Detected' : 'Analyzing Feed...'}</span>
+            <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-40 fade-in">
+               <button 
+                  onClick={captureSnapshot}
+                  className="px-10 py-5 bg-white text-black font-syne font-extrabold uppercase tracking-widest rounded-full hover:bg-amber-400 hover:shadow-[0_0_40px_rgba(252,238,10,0.6)] hover:scale-[1.05] transition-all flex items-center gap-4 drop-shadow-2xl active:scale-95 border-4 border-white/20 hover:border-transparent bg-clip-padding"
+               >
+                  <Camera size={26} /> Capture Snapshot
+               </button>
             </div>
           )}
       </div>

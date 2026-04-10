@@ -1,15 +1,35 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { Mic, Square, Upload, Play, Zap, Brain, ArrowLeft } from 'lucide-react';
+import { Mic, Square, Upload, Play, Zap, Brain, ArrowLeft, Grid } from 'lucide-react';
 
-export default function AudioEmotion() {
+export default function AudioEmotion({ onReturnHome }) {
   const [recording, setRecording] = useState(false);
   const [audioURL, setAudioURL] = useState(null);
   const [file, setFile] = useState(null);
   
   const [viewState, setViewState] = useState('input'); // 'input', 'processing', 'result'
   const [result, setResult] = useState(null);
-  
+  const [feedbackStatus, setFeedbackStatus] = useState(null);
+  const EMOTIONS = ["happy", "sad", "angry", "fear", "neutral", "surprise", "disgust"];
+
+  const handleFeedback = async (isCorrect, correction = null) => {
+    try {
+      await fetch('http://127.0.0.1:8000/api/feedback', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          modality: 'audio',
+          predicted: result.emotion.toLowerCase(),
+          corrected: isCorrect ? result.emotion.toLowerCase() : correction.toLowerCase(),
+          raw_input: file ? file.name : "Recorded Fragment"
+        })
+      });
+      setFeedbackStatus('submitted');
+    } catch (error) {
+      console.error('Feedback submission failed:', error);
+    }
+  };
+
   const [recordTimer, setRecordTimer] = useState(0);
   const timerRef = useRef(null);
   const mediaRecorderRef = useRef(null);
@@ -71,7 +91,7 @@ export default function AudioEmotion() {
       const formData = new FormData();
       formData.append('file', fetchRes, 'audio.wav');
 
-      const response = await axios.post('http://localhost:8000/api/predict/audio', formData, {
+      const response = await axios.post('http://127.0.0.1:8000/api/predict/audio', formData, {
          headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (response.data.error) {
@@ -126,7 +146,7 @@ export default function AudioEmotion() {
               
               {viewState === 'input' && (
                  <div className="flex flex-col h-full fade-in flex-1">
-                    <h3 className="text-sm font-bold font-syne uppercase tracking-[0.3em] text-zinc-500 mb-6 px-1">Audio Source</h3>
+                    <h3 className="text-sm font-bold font-jakarta uppercase tracking-[0.2em] text-zinc-500 mb-6 px-1">Audio Source</h3>
                     
                     <div className="flex-1 w-full flex flex-col items-center justify-center p-12 bg-white/5 border border-white/5 rounded-[2.5rem] shadow-2xl mb-10 relative overflow-hidden group transition-all duration-700">
                         
@@ -150,7 +170,7 @@ export default function AudioEmotion() {
                              <Mic size={56} />}
                           </button>
                           
-                          <h2 className="text-4xl font-syne font-extrabold mb-3 tracking-tighter text-white">
+                          <h2 className="text-4xl font-jakarta font-bold mb-3 tracking-tighter text-white">
                             {recording ? formatTime(recordTimer) : (audioURL ? 'SIGNAL READY' : 'INITIALIZE')}
                           </h2>
                           <p className="text-[10px] font-bold tracking-[0.4em] text-zinc-500 uppercase">
@@ -185,7 +205,7 @@ export default function AudioEmotion() {
                        <button 
                          onClick={handleAnalyze}
                          disabled={!audioURL}
-                         className={`px-12 py-5 rounded-2xl flex items-center gap-4 tracking-[0.2em] font-extrabold font-syne uppercase transition-all shadow-[0_20px_50px_rgba(0,0,0,0.5)] ${
+                         className={`px-12 py-5 rounded-2xl flex items-center gap-4 tracking-[0.1em] font-bold font-jakarta uppercase transition-all shadow-[0_20px_50px_rgba(0,0,0,0.5)] ${
                              audioURL ? "bg-white text-black hover:bg-cyan-400 hover:shadow-[0_0_30px_rgba(0,243,255,0.4)] hover:scale-[1.02]" : "bg-zinc-800 text-zinc-600 cursor-not-allowed"
                          }`}
                        >
@@ -232,8 +252,8 @@ export default function AudioEmotion() {
                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 border-b border-white/5 pb-10 gap-6">
                           <div>
                             <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.3em] mb-4">Neural Signature</h3>
-                            <div className="flex items-center gap-6">
-                              <h2 className="text-7xl md:text-8xl font-extrabold font-syne text-white tracking-tighter uppercase">{result.emotion}</h2>
+                            <div className="flex items-center gap-6 overflow-hidden">
+                               <h2 className="text-3xl md:text-5xl font-extrabold font-syne text-white tracking-tighter uppercase leading-none truncate">{result.emotion}</h2>
                               <div className={`w-4 h-4 rounded-full ${getEmotionColor(result.emotion)} animate-pulse shadow-[0_0_15px_currentColor]`}></div>
                             </div>
                           </div>
@@ -264,9 +284,56 @@ export default function AudioEmotion() {
                                  ))}
                              </div>
                           </div>
-                       </div>
+                  </div>
 
-                       <div className="mt-16 pt-10 border-t border-white/5 flex justify-start">
+                  {/* Reinforcement Feedback Section */}
+                  <div className="mt-12 p-8 rounded-3xl bg-white/[0.02] border border-white/5 flex flex-col md:flex-row items-center justify-between gap-6 shadow-inner">
+                    {feedbackStatus === 'submitted' ? (
+                      <div className="flex items-center gap-4 text-emerald-400 font-syne font-bold uppercase tracking-[0.2em] text-xs">
+                        <Brain size={20} className="animate-pulse" />
+                        Vocal Heuristics Updated. Thank you.
+                      </div>
+                    ) : feedbackStatus === 'incorrect' ? (
+                      <div className="flex flex-col md:flex-row items-center gap-6 w-full">
+                        <span className="text-zinc-500 font-bold uppercase tracking-widest text-[10px] shrink-0">Correct Emotion:</span>
+                        <div className="flex flex-wrap gap-2 flex-1">
+                          {EMOTIONS.filter(e => e !== result.emotion.toLowerCase()).map(emo => (
+                            <button 
+                              key={emo}
+                              onClick={() => handleFeedback(false, emo)}
+                              className="px-4 py-2 rounded-full border border-white/10 text-[10px] font-bold uppercase tracking-wider text-zinc-400 hover:bg-white hover:text-black hover:border-white transition-all"
+                            >
+                              {emo}
+                            </button>
+                          ))}
+                        </div>
+                        <button onClick={() => setFeedbackStatus(null)} className="text-zinc-600 hover:text-white transition-colors text-[10px] font-bold uppercase tracking-widest underline underline-offset-4">Cancel</button>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex flex-col gap-1">
+                          <h4 className="text-white font-bold font-syne tracking-widest uppercase text-xs">Is this analysis accurate?</h4>
+                          <p className="text-zinc-600 text-[10px] font-bold uppercase tracking-[0.1em]">Help refine our spectral models</p>
+                        </div>
+                        <div className="flex gap-4">
+                          <button 
+                            onClick={() => handleFeedback(true)}
+                            className="px-8 py-3 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 hover:bg-emerald-500 hover:text-black transition-all font-bold text-[10px] uppercase tracking-widest"
+                          >
+                            Correct
+                          </button>
+                          <button 
+                            onClick={() => setFeedbackStatus('incorrect')}
+                            className="px-8 py-3 rounded-xl bg-rose-500/10 text-rose-400 border border-rose-500/20 hover:bg-rose-500 hover:text-black transition-all font-bold text-[10px] uppercase tracking-widest"
+                          >
+                            Incorrect
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+
+                       <div className="mt-16 pt-10 border-t border-white/5 flex justify-between items-center">
                           <button 
                              onClick={() => {
                                 setViewState('input');
@@ -281,6 +348,19 @@ export default function AudioEmotion() {
                              </div>
                              Reset Audio Link
                           </button>
+
+                          {onReturnHome && (
+                              <button 
+                                 onClick={onReturnHome}
+                                 className="group flex items-center gap-4 text-zinc-500 hover:text-white transition-all font-syne font-bold tracking-[0.2em] uppercase text-xs"
+                              >
+                                 <span className="hidden md:inline">Return to All Modules</span>
+                                 <span className="md:hidden">Modules</span>
+                                 <div className="p-2 rounded-lg bg-white/5 group-hover:bg-white group-hover:text-black transition-all">
+                                    <Grid size={16} />
+                                 </div>
+                              </button>
+                          )}
                        </div>
                    </div>
                    )}

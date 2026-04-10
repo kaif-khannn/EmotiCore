@@ -1,0 +1,54 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Environment & Logs
+.env
+*.log
+backend/backend.log
+backend/models/analytics_history.json
+
+# Datasets (Large files)
+datasets/raw/
+datasets/processed/
+datasets/feedback/
+!datasets/processed/*.csv # Keep metadata but ignore raw feature files/images if they are in subdirs
+
+# Model Weights (Large binary files)
+backend/models/assets/*.joblib
+backend/models/assets/*.h5
+backend/models/assets/*.keras
+backend/models/assets/*.weights.h5
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.env
+frontend/.env.local
+
+# Build & Cache
+.DS_Store
+.vscode/
+.idea/
+.gemini/

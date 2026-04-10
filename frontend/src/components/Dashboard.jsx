@@ -9,7 +9,7 @@ export default function Dashboard() {
 
   const fetchAnalytics = async () => {
     try {
-      const res = await fetch('http://localhost:8000/api/analytics');
+      const res = await fetch('http://127.0.0.1:8000/api/analytics');
       const data = await res.json();
       setAnalytics(data);
       setError(null);

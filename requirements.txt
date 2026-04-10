@@ -1,0 +1,32 @@
+# Core dependencies for EmotiCore Multimodal AI
+fastapi
+uvicorn[standard]
+python-multipart
+pydantic
+python-dotenv
+
+# AI & Data Science
+numpy
+pandas
+scikit-learn
+scipy
+joblib
+transformers
+torch
+
+# Audio Processing
+librosa
+soundfile
+audioread
+
+# Image & Video Processing
+tensorflow
+opencv-python
+deepface
+
+# Utilities
+huggingface-hub
+requests
+tqdm
+datetime
+math

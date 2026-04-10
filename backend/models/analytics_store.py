@@ -1,19 +1,38 @@
-"""
-In-memory analytics store for tracking all emotion inferences.
-Logs every prediction and computes aggregated stats for the dashboard.
-"""
+import json
+import os
 from datetime import datetime, timedelta
 from collections import defaultdict
 import threading
 
 _lock = threading.Lock()
+_DB_PATH = os.path.join(os.path.dirname(__file__), "analytics_history.json")
 
 # Core storage — list of inference records
 _history = []
 
+def _load_history():
+    global _history
+    if os.path.exists(_DB_PATH):
+        try:
+            with open(_DB_PATH, "r") as f:
+                _history = json.load(f)
+        except Exception as e:
+            print(f"Failed to load analytics history: {e}")
+            _history = []
+
+def _save_history():
+    try:
+        with open(_DB_PATH, "w") as f:
+            json.dump(_history, f)
+    except Exception as e:
+        print(f"Failed to save analytics history: {e}")
+
+# Initial load
+_load_history()
+
 
 def log_inference(modality: str, emotion: str, confidence: float):
-    """Log a single inference result."""
+    """Log a single inference result and persist to JSON."""
     with _lock:
         _history.append({
             "modality": modality,
@@ -21,6 +40,7 @@ def log_inference(modality: str, emotion: str, confidence: float):
             "confidence": confidence,
             "timestamp": datetime.now().isoformat()
         })
+        _save_history()
 
 
 def get_analytics():
