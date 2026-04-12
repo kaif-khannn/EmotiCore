@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Send, Zap, Brain, MessageSquare, ArrowLeft, Activity, Grid } from 'lucide-react';
+import { Send, Zap, Brain, MessageSquare, ArrowLeft, Activity, LayoutGrid } from 'lucide-react';
 
 export default function TextEmotion({ onReturnHome }) {
   const [text, setText] = useState('');
