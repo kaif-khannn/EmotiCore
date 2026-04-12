@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
 import { ArrowUpRight, AlertCircle } from 'lucide-react';
+import { getApiUrl } from '../config';
 
 export default function Dashboard() {
   const [analytics, setAnalytics] = useState(null);
@@ -9,7 +10,7 @@ export default function Dashboard() {
 
   const fetchAnalytics = async () => {
     try {
-      const res = await fetch('/api/analytics');
+      const res = await fetch(getApiUrl('/api/analytics'));
       const data = await res.json();
       setAnalytics(data);
       setError(null);
