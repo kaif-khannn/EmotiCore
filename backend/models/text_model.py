@@ -1,12 +1,11 @@
 import os
 import joblib
 from transformers import pipeline
+import logging
 
-# Load a lightweight, pre-trained model for emotion detection from text
-# Typical classes for j-hartmann/emotion-english-distilroberta-base:
-# anger, disgust, fear, joy, neutral, sadness, surprise
+logger = logging.getLogger("emoticore.text")
 
-# Initialize pipeline lazily or globally
+# Global variables for caching model
 _classifier = None
 _model_format = None
 
@@ -18,23 +17,23 @@ def get_classifier():
             try:
                 _classifier = joblib.load(local_model_path)
                 _model_format = "local"
-                print("INFO: Custom local text model loaded successfully.")
+                logger.info("Custom local text model loaded successfully.")
                 return _classifier, _model_format
             except Exception as e:
-                print(f"WARNING: Found local text model but failed to load ({e}). Falling back.")
+                logger.warning(f"Found local text model but failed to load ({e}). Falling back.")
 
         try:
-            # We use a robust small model
-            print("INFO: Loading Hugging Face text model (distilroberta)... This may take a moment.")
+            logger.info("Loading Hugging Face text model (distilroberta)... This may take a moment.")
             _classifier = pipeline("text-classification", model="j-hartmann/emotion-english-distilroberta-base", return_all_scores=True)
             _model_format = "huggingface"
-            print("INFO: Hugging Face text model loaded successfully.")
+            logger.info("Hugging Face text model loaded successfully.")
         except Exception as e:
-            print(f"Failed to load Hugging Face text model: {e}")
+            logger.error(f"Failed to load Hugging Face text model: {e}")
             _classifier = None
             _model_format = None
             
     return _classifier, _model_format
+
 EMOTION_MAP = {
     "anger": "Angry",
     "disgust": "Disgust",
@@ -55,24 +54,17 @@ def predict_text_emotion(text: str) -> dict:
         
     try:
         breakdown = {}
-        
         if fmt == "local":
             clf = classifier["pipeline"]
             classes = classifier["classes"]
             probs = clf.predict_proba([text])[0]
-            
             for cls_name, prob in zip(classes, probs):
                 clean_label = EMOTION_MAP.get(cls_name, str(cls_name).capitalize())
                 breakdown[clean_label] = float(prob)
-                
-        else: # huggingface format
+        else:
             raw_results = classifier(text)
-            
             if isinstance(raw_results, list) and len(raw_results) > 0:
-                if isinstance(raw_results[0], list):
-                    results = raw_results[0]
-                else:
-                    results = raw_results
+                results = raw_results[0] if isinstance(raw_results[0], list) else raw_results
             else:
                 results = [raw_results]
             
@@ -81,11 +73,9 @@ def predict_text_emotion(text: str) -> dict:
                     clean_label = EMOTION_MAP.get(res['label'], res['label'].capitalize())
                     breakdown[clean_label] = res['score']
             
-        # Find winner
         if not breakdown:
            raise ValueError("No valid emotions found in output")
            
-        # Pyre-friendly max search
         winner = max(breakdown.items(), key=lambda x: x[1])[0]
         confidence = breakdown[winner]
         

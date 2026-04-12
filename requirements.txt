@@ -1,32 +1,9 @@
-# Core dependencies for EmotiCore Multimodal AI
-fastapi
-uvicorn[standard]
-python-multipart
-pydantic
-python-dotenv
+# EmotiCore - Root Requirements
+# For running the backend, install from backend/requirements.txt instead.
+# This file is kept for project-level tooling references.
 
-# AI & Data Science
-numpy
-pandas
-scikit-learn
-scipy
-joblib
-transformers
-torch
+# Install backend: pip install -r backend/requirements.txt
+# Install frontend: cd frontend && npm install
 
-# Audio Processing
-librosa
-soundfile
-audioread
-
-# Image & Video Processing
-tensorflow
-opencv-python
-deepface
-
-# Utilities
-huggingface-hub
-requests
-tqdm
-datetime
-math
+# Pipeline-only extras (for training/preprocessing scripts):
+kagglehub

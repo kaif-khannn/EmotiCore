@@ -9,15 +9,19 @@ from models.fusion import aggregate_predictions
 from models.analytics_store import log_inference, get_analytics
 from utils.serialization import to_python_types
 
+from routes.schemas import PredictionResponse, HealthCheckResponse, AnalyticsResponse
 from routes.feedback import router as feedback_router
+
+import logging
+logger = logging.getLogger("emoticore.api")
 
 router = APIRouter()
 router.include_router(feedback_router)
 
-@router.get("/health-check")
+@router.get("/health-check", response_model=HealthCheckResponse)
 async def get_system_status():
     """Return the status of the underlying emotion recognition models."""
-    print("DEBUG: /api/health-check hit")
+    logger.debug("Health check requested")
     return {
         "audio": get_audio_status(),
         "image": get_image_status(),
@@ -27,7 +31,7 @@ async def get_system_status():
 class TextInput(BaseModel):
     text: str
 
-@router.post("/predict/text")
+@router.post("/predict/text", response_model=PredictionResponse)
 async def predict_text(input_data: TextInput):
     """Predict emotion from provided text."""
     result = predict_text_emotion(input_data.text)
@@ -35,7 +39,7 @@ async def predict_text(input_data: TextInput):
         log_inference("text", result.get("emotion", "Unknown"), float(result.get("confidence", 0)))
     return to_python_types(result)
 
-@router.post("/predict/audio")
+@router.post("/predict/audio", response_model=PredictionResponse)
 async def predict_audio(file: UploadFile = File(...)):
     """Predict emotion from provided audio file (.wav)."""
     audio_bytes = await file.read()
@@ -44,7 +48,7 @@ async def predict_audio(file: UploadFile = File(...)):
         log_inference("audio", result.get("emotion", "Unknown"), float(result.get("confidence", 0)))
     return to_python_types(result)
 
-@router.post("/predict/image")
+@router.post("/predict/image", response_model=PredictionResponse)
 async def predict_image(file: UploadFile = File(...)):
     """Predict emotion from provided image file."""
     image_bytes = await file.read()
@@ -55,12 +59,12 @@ async def predict_image(file: UploadFile = File(...)):
         log_inference("image", emotion, confidence)
     return to_python_types(result)
 
-@router.get("/analytics")
+@router.get("/analytics", response_model=AnalyticsResponse)
 async def analytics():
     """Return aggregated analytics from all inference history."""
     return get_analytics()
 
-@router.post("/predict/fusion")
+@router.post("/predict/fusion", response_model=PredictionResponse)
 async def predict_fusion(
     text: Optional[str] = Form(None),
     audio: Optional[UploadFile] = File(None),

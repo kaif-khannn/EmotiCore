@@ -10,7 +10,7 @@
   --accent-tertiary: #fcee0a; /* Yellow Bolt */
   
   /* Gradients */
-  --gradient-kinetic: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+  --gradient-kinetic: linear-gradient(to right, #00f3ff 0%, #4facfe 25%, #8c88ff 50%, #f093fb 75%, #ff0055 100%);
   --gradient-obsidian: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0) 100%);
   
   /* Text Colors */

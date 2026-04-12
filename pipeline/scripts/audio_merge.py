@@ -1,7 +1,7 @@
 """
 pipeline/audio/merge_audio.py
 -------------------------------
-Merges ravdess_meta.csv + tess_meta.csv + cremad_meta.csv + savee_meta.csv,
+Merges ravdess_meta.csv (the only available audio dataset),
 balances classes via random oversampling (duplicate + mild noise),
 writes final audio_dataset.csv.
 
@@ -34,7 +34,7 @@ def _augment_npy(src_path: str, dst_path: str, noise_std: float = 0.01):
 
 
 def run():
-    sources = ["ravdess_meta.csv", "tess_meta.csv", "cremad_meta.csv", "savee_meta.csv"]
+    sources = ["ravdess_meta.csv"]
     frames = []
     for src in sources:
         path = os.path.join(PROC_AUDIO_DIR, src)

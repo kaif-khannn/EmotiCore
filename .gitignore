@@ -33,7 +33,6 @@ backend/models/analytics_history.json
 datasets/raw/
 datasets/processed/
 datasets/feedback/
-!datasets/processed/*.csv # Keep metadata but ignore raw feature files/images if they are in subdirs
 
 # Model Weights (Large binary files)
 backend/models/assets/*.joblib
@@ -52,3 +51,18 @@ frontend/.env.local
 .vscode/
 .idea/
 .gemini/
+
+# HuggingFace & Kaggle Cache (placed on D: drive)
+d:/huggingface_cache/
+d:/.kaggle/
+
+# Notebooks
+notebooks/.ipynb_checkpoints/
+
+# Debug / scratch scripts at root
+check_scaler.py
+convert_model.py
+debug_audio_model.py
+test_audio_feat.py
+test_load.py
+check_routes.py

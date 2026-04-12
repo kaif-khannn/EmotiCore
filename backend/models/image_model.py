@@ -1,8 +1,10 @@
 import numpy as np
 import cv2
-from deepface import DeepFace
 import io
 import os
+import logging
+
+logger = logging.getLogger("emoticore.image")
 
 _CUSTOM_MODEL = None
 _CUSTOM_MODE_CHECKED = False
@@ -15,20 +17,14 @@ def _load_custom_image_model():
         local_path = os.path.join(os.path.dirname(__file__), "assets", "image_model.keras")
         if os.path.exists(local_path):
             try:
-                import keras
+                import tensorflow as tf
+                from tensorflow import keras
                 _CUSTOM_MODEL = keras.models.load_model(local_path)
-                import cv2
                 _FACE_CASCADE = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
-                print(f"INFO: Custom local image model (.keras) loaded successfully from {local_path}")
+                logger.info(f"Custom local image model (.keras) loaded successfully from {local_path}")
             except Exception as e:
-                print(f"WARNING: Found local .keras model at {local_path} but failed to load ({e}). Falling back to DeepFace.")
-
-        else:
-            print(f"WARNING: Image model weights not found at {local_path}.")
+                logger.warning(f"Found local .keras model at {local_path} but failed to load ({e}). Falling back to DeepFace.")
         _CUSTOM_MODE_CHECKED = True
-
-
-
 
 def get_status() -> dict:
     global _CUSTOM_MODEL
@@ -40,9 +36,6 @@ def get_status() -> dict:
     }
 
 def predict_image_emotion(image_bytes: bytes) -> dict:
-    """
-    Takes image bytes, decodes using OpenCV, and detects emotion using DeepFace.
-    """
     try:
         # Decode the bytes directly to a numpy array (cv2 image)
         np_arr = np.frombuffer(image_bytes, np.uint8)
@@ -54,20 +47,17 @@ def predict_image_emotion(image_bytes: bytes) -> dict:
         _load_custom_image_model()
         
         if _CUSTOM_MODEL is not None:
-            # Native EfficientNetB0 Optimized Inference (96x96)
+            import tensorflow as tf
+            faces_output = []
             gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
             raw_faces = _FACE_CASCADE.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
             
-            faces_output = []
-            import tensorflow as tf
-            
             for (x, y, w, h) in raw_faces:
-                # Filter full-frame artifacts
                 if w >= img.shape[1] - 5 and h >= img.shape[0] - 5:
                     continue
                 
                 face_crop = img[y:y+h, x:x+w]
-                face_crop = cv2.resize(face_crop, (96, 96)) # Match EfficientNet trainer
+                face_crop = cv2.resize(face_crop, (96, 96))
                 face_crop = cv2.cvtColor(face_crop, cv2.COLOR_BGR2RGB)
                 
                 face_input = tf.keras.applications.mobilenet_v2.preprocess_input(face_crop.astype(np.float32))
@@ -95,7 +85,7 @@ def predict_image_emotion(image_bytes: bytes) -> dict:
                 "breakdown": faces_output[0]["breakdown"]
             }
         else:
-            # Fallback to standard DeepFace
+            from deepface import DeepFace
             raw_results = DeepFace.analyze(img, actions=['emotion'], enforce_detection=False, detector_backend='opencv')
             if not isinstance(raw_results, list):
                 raw_results = [raw_results]

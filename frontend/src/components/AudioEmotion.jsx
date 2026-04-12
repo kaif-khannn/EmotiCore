@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import { Mic, Square, Upload, Play, Zap, Brain, ArrowLeft, Grid } from 'lucide-react';
+import { Mic, Square, Upload, Play, Zap, Brain } from 'lucide-react';
 
 export default function AudioEmotion({ onReturnHome }) {
   const [recording, setRecording] = useState(false);
@@ -14,7 +14,7 @@ export default function AudioEmotion({ onReturnHome }) {
 
   const handleFeedback = async (isCorrect, correction = null) => {
     try {
-      await fetch('http://127.0.0.1:8000/api/feedback', {
+      await fetch('/api/feedback', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -91,7 +91,7 @@ export default function AudioEmotion({ onReturnHome }) {
       const formData = new FormData();
       formData.append('file', fetchRes, 'audio.wav');
 
-      const response = await axios.post('http://127.0.0.1:8000/api/predict/audio', formData, {
+      const response = await axios.post('/api/predict/audio', formData, {
          headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (response.data.error) {
@@ -101,7 +101,8 @@ export default function AudioEmotion({ onReturnHome }) {
       setTimeout(() => { setViewState('result'); }, 1500);
     } catch (err) {
       console.error('Audio analysis failed:', err);
-      setResult({ error: true, message: err.message || 'Backend unreachable. Ensure the server is running on port 8000.' });
+      const msg = err.response?.data?.error || err.response?.data?.detail || err.message || 'Backend unreachable.';
+      setResult({ error: true, message: msg });
       setViewState('result');
     }
   };
@@ -126,33 +127,31 @@ export default function AudioEmotion({ onReturnHome }) {
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto pt-4">
-      <div className="flex items-center gap-6 mb-6 fade-in">
-        <div className="p-5 obsidian-panel border-white/10 bg-white/5 flex items-center justify-center text-rose-400 shadow-2xl">
-          <Mic size={36} />
-        </div>
-        <div>
-          <h2 className="text-4xl font-extrabold font-syne text-white tracking-tight">Vocal <span className="gradient-text">Prosody</span></h2>
-          <p className="text-zinc-500 text-[10px] font-bold tracking-[0.3em] uppercase mt-2">Neural Frequency Analysis</p>
+    <div className="flex flex-col gap-6 w-full max-w-4xl mx-auto pt-4 h-full">
+      <div className="flex items-center justify-between mb-6 fade-in px-2">
+        <div className="flex items-center gap-6">
+          <div className="p-5 obsidian-panel border-white/10 bg-white/5 flex items-center justify-center text-rose-400 shadow-2xl">
+            <Mic size={36} />
+          </div>
+          <div>
+            <h2 className="text-4xl font-extrabold font-syne text-white tracking-tight leading-none">Vocal <span className="gradient-text text-rose-400">Prosody</span></h2>
+            <p className="text-zinc-500 text-[10px] font-bold tracking-[0.3em] uppercase mt-3">Neural Acoustic Matrix</p>
+          </div>
         </div>
       </div>
 
-      {/* Massive Single Module Card */}
-      {/* Massive Single Module Card - Optimized for Expansion & Containment */}
-      <div className="relative w-full rounded-[2rem] shadow-[0_40px_80px_rgba(0,0,0,0.9)] transition-all duration-700 bg-[#0a0a0a] border-t border-white/10 overflow-hidden">
-          
-           {/* Foreground App Content Layer */}
-           <div className="relative z-20 w-full flex flex-col p-10 md:p-16 min-h-[500px] font-jakarta">
+      <div className="relative w-full rounded-[2rem] shadow-[0_40px_80px_rgba(0,0,0,0.9)] transition-all duration-700 bg-[#0a0a0a] border-t border-white/10 overflow-hidden max-h-[85vh] sm:max-h-[75vh] flex flex-col">
+           <div className="relative z-20 w-full flex flex-col p-6 md:p-16 min-h-[400px] md:min-h-[500px] font-jakarta overflow-y-auto custom-scrollbar flex-1">
               
               {viewState === 'input' && (
                  <div className="flex flex-col h-full fade-in flex-1">
                     <h3 className="text-sm font-bold font-jakarta uppercase tracking-[0.2em] text-zinc-500 mb-6 px-1">Audio Source</h3>
                     
-                    <div className="flex-1 w-full flex flex-col items-center justify-center p-12 bg-white/5 border border-white/5 rounded-[2.5rem] shadow-2xl mb-10 relative overflow-hidden group transition-all duration-700">
+                    <div className="flex-1 w-full flex flex-col items-center justify-center p-8 md:p-12 bg-white/5 border border-white/5 rounded-[2.5rem] shadow-2xl mb-10 relative overflow-hidden group transition-all duration-700">
                         
                         {recording && (
                           <div className="absolute inset-0 flex items-center justify-center">
-                             <div className="w-[400px] h-[400px] bg-rose-500/10 rounded-full blur-[100px] animate-pulse"></div>
+                             <div className="w-64 h-64 md:w-[400px] md:h-[400px] bg-rose-500/10 rounded-full blur-[80px] md:blur-[100px] animate-pulse"></div>
                           </div>
                         )}
 
@@ -248,43 +247,69 @@ export default function AudioEmotion({ onReturnHome }) {
                         </div>
                      </div>
                    ) : (
-                   <div className="flex-1 flex flex-col">
-                       <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 border-b border-white/5 pb-10 gap-6">
-                          <div>
-                            <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.3em] mb-4">Neural Signature</h3>
-                            <div className="flex items-center gap-6 overflow-hidden">
-                               <h2 className="text-3xl md:text-5xl font-extrabold font-syne text-white tracking-tighter uppercase leading-none truncate">{result.emotion}</h2>
-                              <div className={`w-4 h-4 rounded-full ${getEmotionColor(result.emotion)} animate-pulse shadow-[0_0_15px_currentColor]`}></div>
-                            </div>
-                          </div>
-                          
-                          <div className="md:text-right pt-4 md:pt-0">
-                             <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.3em] mb-4">Spectral Match</h3>
-                             <p className="text-5xl md:text-6xl font-extrabold font-syne text-rose-400 tracking-tighter">{((result.confidence || 0) * 100).toFixed(1)}%</p>
-                          </div>
-                       </div>
-                       
-                       <div className="space-y-10 flex-1">
-                          <div>
-                             <h3 className="text-[10px] font-bold text-zinc-500 uppercase tracking-[0.2em] mb-8">Harmonic Distribution</h3>
-                             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-16 gap-y-12">
-                                 {Object.entries((result.probabilities || result.breakdown || {})).sort((a,b)=>b[1]-a[1]).map(([emo, val]) => (
-                                     <div key={emo} className="flex flex-col gap-3 group">
-                                        <div className="flex justify-between items-end">
-                                            <span className="text-zinc-400 font-bold font-syne uppercase tracking-widest text-[11px] group-hover:text-white transition-all">{emo}</span>
-                                            <span className="text-zinc-500 font-bold text-xs">{(val * 100).toFixed(1)}%</span>
-                                        </div>
-                                        <div className="w-full bg-zinc-900 rounded-full h-1.5 overflow-hidden">
-                                            <div 
-                                              className={`h-full rounded-full transition-all duration-[2s] cubic-bezier(0.2, 1, 0.2, 1) ${getEmotionColor(emo)}`}
-                                              style={{ width: `${val * 100}%` }}
-                                            ></div>
-                                        </div>
-                                     </div>
-                                 ))}
-                             </div>
-                          </div>
-                  </div>
+                    <div className="flex-1 flex flex-col">
+                        {/* HERO RESULT SECTION */}
+                        <div className="relative p-8 md:p-10 rounded-[2.5rem] bg-white/[0.03] border border-white/10 mb-10 overflow-hidden group shadow-2xl">
+                           <div className={`absolute -right-20 -top-20 w-80 h-80 rounded-full blur-[100px] opacity-20 transition-all duration-1000 group-hover:scale-110 ${getEmotionColor(result.emotion).split(' ')[0]}`}></div>
+                           <div className={`absolute -left-20 -bottom-20 w-80 h-80 rounded-full blur-[100px] opacity-10 transition-all duration-1000 group-hover:scale-110 ${getEmotionColor(result.emotion).split(' ')[0]}`}></div>
+                           
+                           <div className="relative z-10 flex flex-col items-center text-center">
+                              <h3 className="text-[9px] font-black text-white/40 uppercase tracking-[0.5em] mb-4">Dominant Resonance</h3>
+                              
+                              <div className="space-y-2 mb-6">
+                                 <h2 className="text-4xl md:text-5xl font-black font-syne text-white tracking-tighter uppercase leading-none drop-shadow-2xl italic">
+                                    {result.emotion}
+                                 </h2>
+                                 <div className="flex items-center justify-center gap-3">
+                                    <div className={`h-1 w-8 rounded-full ${getEmotionColor(result.emotion).split(' ')[0]}`}></div>
+                                    <span className="text-zinc-500 font-bold uppercase tracking-widest text-[9px]">Neural Lock</span>
+                                    <div className={`h-1 w-8 rounded-full ${getEmotionColor(result.emotion).split(' ')[0]}`}></div>
+                                 </div>
+                              </div>
+
+                              <div className="flex flex-col items-center">
+                                 <div className="text-5xl md:text-6xl font-black font-syne text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20 tracking-tighter leading-snug mb-1 pt-2">
+                                    {((result.confidence || 0) * 100).toFixed(1)}%
+                                 </div>
+                                 <span className={`font-bold uppercase tracking-[0.3em] text-[10px] ${getEmotionColor(result.emotion).includes('rose') ? 'text-rose-400' : getEmotionColor(result.emotion).includes('cyan') ? 'text-cyan-400' : getEmotionColor(result.emotion).includes('amber') || getEmotionColor(result.emotion).includes('yellow') ? 'text-amber-400' : 'text-white/40'}`}>Confidence Score</span>
+                              </div>
+                           </div>
+                        </div>
+                        
+                        <div className="space-y-10 flex-1">
+                           <div>
+                              <div className="flex items-center gap-4 mb-8">
+                                 <h3 className="text-[10px] font-black text-white uppercase tracking-[0.4em]">Intensity distribution</h3>
+                                 <div className="h-px flex-1 bg-gradient-to-r from-white/10 to-transparent"></div>
+                                 
+                                 <button 
+                                    onClick={() => { setViewState('input'); setResult(null); setAudioURL(null); setFile(null); }}
+                                    className="px-6 py-2 rounded-xl bg-white/5 border border-white/10 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all flex items-center gap-2"
+                                 >
+                                    <Zap size={14} /> Retry
+                                 </button>
+                              </div>
+                              
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 md:gap-x-16 gap-y-6 md:gap-y-10">
+                                  {Object.entries(result.breakdown || {}).sort((a,b)=>b[1]-a[1]).map(([emo, val]) => (
+                                      <div key={emo} className="flex flex-col gap-3 group">
+                                         <div className="flex justify-between items-end px-1">
+                                             <span className="text-zinc-400 font-black font-syne uppercase tracking-[0.2em] text-[11px] group-hover:text-white transition-all">{emo}</span>
+                                             <span className="text-zinc-500 font-bold font-jakarta text-[10px]">{(val * 100).toFixed(1)}%</span>
+                                         </div>
+                                         <div className="w-full bg-white/[0.03] rounded-full h-3 overflow-hidden p-[2px] border border-white/5 shadow-inner">
+                                             <div 
+                                               className={`h-full rounded-full transition-all duration-[2.5s] ease-out shadow-[0_0_20px_rgba(0,0,0,0.5)] ${getEmotionColor(emo)}`}
+                                               style={{ width: `${val * 100}%` }}
+                                             >
+                                                <div className="w-full h-1/2 bg-white/20 rounded-t-full"></div>
+                                             </div>
+                                         </div>
+                                      </div>
+                                  ))}
+                              </div>
+                           </div>
+                        </div>
 
                   {/* Reinforcement Feedback Section */}
                   <div className="mt-12 p-8 rounded-3xl bg-white/[0.02] border border-white/5 flex flex-col items-center gap-8 shadow-inner">
@@ -341,35 +366,6 @@ export default function AudioEmotion({ onReturnHome }) {
                     )}
                   </div>
 
-                       <div className="mt-16 pt-10 border-t border-white/5 flex justify-between items-center">
-                          <button 
-                             onClick={() => {
-                                setViewState('input');
-                                setResult(null);
-                                setAudioURL(null);
-                                setFile(null);
-                             }} 
-                             className="group flex items-center gap-4 text-white hover:text-rose-400 transition-all font-syne font-bold tracking-[0.2em] uppercase text-xs"
-                          >
-                             <div className="p-2 rounded-xl bg-white/5 group-hover:bg-rose-400 group-hover:text-black transition-all">
-                                <ArrowLeft size={16} />
-                             </div>
-                             Reset Audio Link
-                          </button>
-
-                          {onReturnHome && (
-                              <button 
-                                 onClick={onReturnHome}
-                                 className="group flex items-center gap-4 text-zinc-500 hover:text-white transition-all font-syne font-bold tracking-[0.2em] uppercase text-xs"
-                              >
-                                 <span className="hidden md:inline">Return to All Modules</span>
-                                 <span className="md:hidden">Modules</span>
-                                 <div className="p-2 rounded-lg bg-white/5 group-hover:bg-white group-hover:text-black transition-all">
-                                    <Grid size={16} />
-                                 </div>
-                              </button>
-                          )}
-                       </div>
                    </div>
                    )}
                 </div>

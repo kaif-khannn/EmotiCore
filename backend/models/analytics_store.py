@@ -4,6 +4,9 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 import threading
 
+import logging
+logger = logging.getLogger("emoticore.analytics")
+
 _lock = threading.Lock()
 _DB_PATH = os.path.join(os.path.dirname(__file__), "analytics_history.json")
 
@@ -15,9 +18,18 @@ def _load_history():
     if os.path.exists(_DB_PATH):
         try:
             with open(_DB_PATH, "r") as f:
-                _history = json.load(f)
+                raw_data = json.load(f)
+                # Ensure confidence is float and other types are correct
+                _history = []
+                for entry in raw_data:
+                    _history.append({
+                        "modality": str(entry.get("modality", "unknown")),
+                        "emotion": str(entry.get("emotion", "Unknown")),
+                        "confidence": float(entry.get("confidence", 0.0)),
+                        "timestamp": str(entry.get("timestamp", datetime.now().isoformat()))
+                    })
         except Exception as e:
-            print(f"Failed to load analytics history: {e}")
+            logger.error(f"Failed to load analytics history: {e}")
             _history = []
 
 def _save_history():
@@ -25,7 +37,7 @@ def _save_history():
         with open(_DB_PATH, "w") as f:
             json.dump(_history, f)
     except Exception as e:
-        print(f"Failed to save analytics history: {e}")
+        logger.error(f"Failed to save analytics history: {e}")
 
 # Initial load
 _load_history()
@@ -58,7 +70,7 @@ def get_analytics():
             }
 
         # Average confidence
-        avg_conf = sum(r["confidence"] for r in _history) / total
+        avg_conf = sum(float(r["confidence"]) for r in _history) / total
 
         # Emotion counts bucketed by date for time-series chart
         emotion_by_date = defaultdict(lambda: defaultdict(int))

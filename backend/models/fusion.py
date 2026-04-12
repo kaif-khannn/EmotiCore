@@ -1,4 +1,5 @@
-# fusion.py
+import logging
+logger = logging.getLogger("emoticore.fusion")
 
 def aggregate_predictions(predictions: dict) -> dict:
     """
@@ -32,24 +33,26 @@ def aggregate_predictions(predictions: dict) -> dict:
         breakdown = mod_result["breakdown"]
         
         for emotion in all_emotions:
-            combined_scores[emotion] += breakdown.get(emotion, 0.0) * weight
+            val = float(breakdown.get(emotion, 0.0))
+            combined_scores[emotion] += val * float(weight)
             
-        total_weight += weight
+        total_weight += float(weight)
         
     if total_weight == 0:
+        logger.warning("No valid predictions available for fusion. Returning Unknown.")
         return {
             "emotion": "Unknown",
-            "confidence": 0,
+            "confidence": 0.0,
             "breakdown": combined_scores,
             "individual_predictions": predictions
         }
         
     # Normalize by total active weight
     for emotion in all_emotions:
-        combined_scores[emotion] = round(combined_scores[emotion] / total_weight, 3)
+        combined_scores[emotion] = round(float(combined_scores[emotion] / total_weight), 3)
         
-    winner = max(combined_scores, key=combined_scores.get)
-    final_confidence = combined_scores[winner]
+    winner = str(max(combined_scores, key=lambda k: float(combined_scores[k])))
+    final_confidence = float(combined_scores[winner])
     
     return {
         "emotion": winner,

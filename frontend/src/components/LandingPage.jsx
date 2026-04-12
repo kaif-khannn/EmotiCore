@@ -6,12 +6,21 @@ import * as THREE from 'three';
 function InteractiveSphere({ scrollY }) {
   const pointsRef = useRef();
   const linesRef = useRef();
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   const { originalPositions, indices } = useMemo(() => {
     const pts = [];
     const idx = [];
-    const density = 1000; // Drastically increased nodes density
-    const radius = 2.4; // Smaller sphere scale
+    // Dynamically scale parameters based on mobile vs desktop to optimize rendering
+    const isMobile = windowWidth < 768;
+    const density = isMobile ? 400 : 1000; 
+    const radius = isMobile ? 1.4 : 2.4; 
     
     // Golden spiral algorithm for perfectly even distributed sphere points
     for (let i = 0; i < density; i++) {
@@ -43,7 +52,7 @@ function InteractiveSphere({ scrollY }) {
       originalPositions: new Float32Array(pts), 
       indices: new Uint16Array(idx) 
     };
-  }, []);
+  }, [windowWidth]);
 
   const dynamicPositions = useMemo(() => new Float32Array(originalPositions), [originalPositions]);
   const dummyVector = new THREE.Vector3();
@@ -85,7 +94,7 @@ function InteractiveSphere({ scrollY }) {
         let dist = Math.sqrt(dx*dx + dy*dy + dz*dz);
         
         let force = 0;
-        const radiusOfInteraction = 1.5; // Scaled down to match smaller sphere
+        const radiusOfInteraction = windowWidth < 768 ? 0.8 : 1.5; 
         
         // Push outward if cursor enters sphere field
         if (state.pointer.x !== 0 && state.pointer.y !== 0 && dist < radiusOfInteraction) {
@@ -156,8 +165,8 @@ export default function LandingPage({ onGetStarted }) {
       </div>
 
       {/* Top Logo Navbar */}
-      <nav className="fixed top-0 left-0 w-full p-8 z-50 flex items-center justify-between pointer-events-none">
-         <div className="flex items-center gap-4 pointer-events-auto">
+      <nav className="fixed top-0 left-0 w-full p-4 md:p-8 z-50 flex items-center justify-between pointer-events-none">
+         <div className="flex items-center gap-2 md:gap-4 pointer-events-auto">
             <div className="flex items-center gap-4">
               <svg width="0" height="0">
                 <linearGradient id="gradientBrain" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -165,24 +174,24 @@ export default function LandingPage({ onGetStarted }) {
                   <stop stopColor="var(--accent-secondary)" offset="100%" />
                 </linearGradient>
               </svg>
-              <Brain size={44} strokeWidth={1.5} className="text-transparent drop-shadow-md" style={{ stroke: 'url(#gradientBrain)' }} />
+              <Brain size={32} strokeWidth={1.5} className="text-transparent drop-shadow-md md:w-[44px] md:h-[44px]" style={{ stroke: 'url(#gradientBrain)' }} />
               <div className="ml-2">
-                <h1 className="text-4xl font-extrabold font-syne text-white tracking-tighter">
+                <h1 className="text-2xl md:text-4xl font-extrabold font-syne text-white tracking-tighter">
                   EMOTICORE
                 </h1>
-                <p className="text-[13px] text-zinc-500 font-semibold tracking-[0.2em] uppercase mt-1">Multi-Modal AI System</p>
+                <p className="text-[10px] md:text-[13px] text-zinc-500 font-semibold tracking-[0.2em] uppercase mt-1">Multi-Modal AI System</p>
               </div>
             </div>
          </div>
       </nav>
 
       {/* Hero Section */}
-      <div className="relative z-10 pt-64 pb-8 px-12 lg:px-24 min-h-[80vh] flex flex-col justify-center items-center text-center max-w-7xl mx-auto">
-         <h1 className="text-7xl lg:text-[10rem] font-syne font-extrabold tracking-tighter leading-[0.85] text-white drop-shadow-2xl">
+      <div className="relative z-10 pt-48 md:pt-64 pb-8 px-6 md:px-12 lg:px-24 min-h-[80vh] flex flex-col justify-center items-center text-center max-w-7xl mx-auto">
+         <h1 className="text-5xl sm:text-7xl lg:text-[10rem] font-syne font-extrabold tracking-tighter leading-[0.85] text-white drop-shadow-2xl">
             DECODE <br/>
             <span className="gradient-text">EMOTION</span>
          </h1>
-         <p className="mt-12 text-xl md:text-2xl text-zinc-400 max-w-3xl leading-relaxed font-jakarta">
+         <p className="mt-8 md:mt-12 text-base md:text-2xl text-zinc-400 max-w-3xl leading-relaxed font-jakarta">
             Beyond words. Beyond voice. Beyond expressions. <br/>
             The world's most advanced multi-modal emotion intelligence engine.
          </p>
@@ -195,21 +204,21 @@ export default function LandingPage({ onGetStarted }) {
       </div>
 
       {/* Hero Description & Call to Action Card [Vertical Layout] */}
-      <div className="relative z-20 px-8 md:px-12 lg:px-24 pb-32 flex justify-center mx-auto w-full max-w-[90rem] mt-40">
-         <div className="obsidian-panel w-full max-w-5xl p-12 md:p-20 flex flex-col gap-10 items-center justify-center text-center border-t-2 border-t-white/10">
-            <p className="text-2xl md:text-4xl text-white leading-tight font-syne font-bold tracking-tight">
+      <div className="relative z-20 px-4 md:px-12 lg:px-24 pb-20 md:pb-32 flex justify-center mx-auto w-full max-w-[90rem] mt-20 md:mt-40">
+         <div className="obsidian-panel w-full max-w-5xl p-8 md:p-20 flex flex-col gap-6 md:gap-10 items-center justify-center text-center border-t-2 border-t-white/10">
+            <p className="text-xl md:text-4xl text-white leading-tight font-syne font-bold tracking-tight">
                "Most people hear words. We read the human spectrum."
             </p>
-            <p className="text-lg md:text-xl text-zinc-400 leading-relaxed max-w-3xl">
+            <p className="text-base md:text-xl text-zinc-400 leading-relaxed max-w-3xl">
                EmotiCore analyzes how you speak, write and express—revealing the emotion behind every interaction. Try it. Watch it understand you.
             </p>
          </div>
       </div>
 
       {/* Modality Details Section */}
-      <div className="relative z-10 p-12 lg:px-24 min-h-screen flex flex-col items-center justify-center gap-16 max-w-7xl mx-auto text-center">
-         <h2 className="text-5xl lg:text-7xl font-syne font-extrabold text-white tracking-tight">
-            TRI-MODAL <span className="gradient-text">INTELLIGENCE</span>
+      <div className="relative z-10 p-6 sm:p-12 lg:px-24 min-h-screen flex flex-col items-center justify-center gap-10 md:gap-16 max-w-7xl mx-auto text-center">
+         <h2 className="text-4xl md:text-5xl lg:text-7xl font-syne font-extrabold text-white tracking-tight">
+            TRI-MODAL <br className="md:hidden" /><span className="gradient-text">INTELLIGENCE</span>
          </h2>
          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-8 text-left w-full">
             
@@ -247,8 +256,8 @@ export default function LandingPage({ onGetStarted }) {
       </div>
 
       {/* Workflow Architecture Section */}
-      <div className="relative z-10 p-12 lg:px-24 min-h-screen flex flex-col justify-center gap-12 max-w-7xl mx-auto">
-         <h2 className="text-4xl lg:text-6xl font-syne font-extrabold text-white tracking-tight text-center mb-16">
+      <div className="relative z-10 p-6 sm:p-12 lg:px-24 min-h-screen flex flex-col justify-center gap-10 max-w-7xl mx-auto mb-20">
+         <h2 className="text-3xl md:text-4xl lg:text-6xl font-syne font-extrabold text-white tracking-tight text-center mb-6 md:mb-16">
             CORE <span className="text-zinc-500">PIPELINE</span>
          </h2>
          
@@ -279,6 +288,54 @@ export default function LandingPage({ onGetStarted }) {
                   Probabilistic normalization across modalities to compute the final unified emotion vector.
                </p>
             </div>
+         </div>
+      </div>
+
+      {/* Tech Stack Section */}
+      <div className="relative z-10 p-6 sm:p-12 lg:px-24 mb-32 flex flex-col items-center justify-center max-w-7xl mx-auto text-center font-jakarta border-t border-white/5 pt-32">
+         <h2 className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.4em] text-zinc-500 mb-10 w-full text-center">SYSTEM REQUISITES</h2>
+         
+         <div className="flex flex-wrap justify-center items-center gap-4 sm:gap-6 md:gap-10 opacity-70 w-full max-w-4xl mx-auto">
+            {/* React */}
+            <div className="flex items-center gap-2 sm:gap-3 px-4 py-2 sm:px-6 sm:py-3 rounded-full bg-white/5 border border-white/10 text-cyan-400 font-bold transition-all hover:scale-105 shadow-xl hover:bg-cyan-500/10 cursor-default active:scale-95">
+                <svg viewBox="-11.5 -10.23174 23 20.46348" className="w-4 h-4 sm:w-5 sm:h-5 fill-current">
+                   <circle cx="0" cy="0" r="2.05" fill="#61dafb"/>
+                   <g stroke="#61dafb" strokeWidth="1" fill="none">
+                      <ellipse rx="11" ry="4.2"/>
+                      <ellipse rx="11" ry="4.2" transform="rotate(60)"/>
+                      <ellipse rx="11" ry="4.2" transform="rotate(120)"/>
+                   </g>
+                </svg>
+                <span className="text-xs sm:text-sm tracking-widest uppercase">React</span>
+            </div>
+
+            {/* FastAPI */}
+            <div className="flex items-center gap-2 sm:gap-3 px-4 py-2 sm:px-6 sm:py-3 rounded-full bg-white/5 border border-white/10 text-[#059669] font-bold transition-all hover:scale-105 shadow-xl hover:bg-[#059669]/10 cursor-default active:scale-95">
+                <svg viewBox="0 0 24 24" className="w-4 h-4 sm:w-5 sm:h-5 fill-current">
+                   <g fill="none" fillRule="evenodd">
+                      <path fill="currentColor" d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm-1.25 18v-4.5H5.5L13.25 6v4.5h5.25L10.75 18z"/>
+                   </g>
+                </svg>
+                <span className="text-xs sm:text-sm tracking-widest uppercase text-emerald-400">FastAPI</span>
+            </div>
+
+            {/* TensorFlow */}
+            <div className="flex items-center gap-2 sm:gap-3 px-4 py-2 sm:px-6 sm:py-3 rounded-full bg-white/5 border border-white/10 text-[#FF6F00] font-bold transition-all hover:scale-105 shadow-xl hover:bg-[#FF6F00]/10 cursor-default active:scale-95">
+                <svg viewBox="0 0 24 24" className="w-4 h-4 sm:w-5 sm:h-5 fill-current">
+                   <path d="M12.012 1.3L1.516 7.35v9.3l10.496 6.05 10.472-6.05v-9.3L12.012 1.3zm0 2.21l8.536 4.93-2.915 1.68-5.621-3.24L6.39 10.12l-2.946-1.7 8.568-4.91zm0 2.21l3.705 2.14-1.852 1.07-1.853-1.07-1.853 1.07-1.852-1.07 3.705-2.14zm-6.621 3.82l6.621 3.82v7.64l-6.621-3.82V9.54zm13.242 0v7.64l-6.621 3.82v-7.64l6.621-3.82z"/>
+                </svg>
+                <span className="text-xs sm:text-sm tracking-widest uppercase">TensorFlow</span>
+            </div>
+            
+            {/* Scikit-Learn */}
+            <div className="flex items-center gap-2 sm:gap-3 px-4 py-2 sm:px-6 sm:py-3 rounded-full bg-white/5 border border-white/10 text-rose-400 font-bold transition-all hover:scale-105 shadow-xl hover:bg-rose-500/10 cursor-default active:scale-95">
+                <span className="font-extrabold font-syne text-base sm:text-lg italic tracking-tighter">scikit-</span>
+                <span className="text-xs sm:text-sm tracking-widest uppercase text-white/80">learn</span>
+            </div>
+         </div>
+         
+         <div className="mt-8 text-center text-zinc-500 lg:px-60 text-xs sm:text-sm leading-relaxed max-w-2xl">
+            Asynchronous multi-modal compute pipeline heavily reliant strictly on robust architectural heuristics, scaling efficiently across hardware. 
          </div>
       </div>
 

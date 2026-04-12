@@ -42,9 +42,6 @@ def main():
         return
 
     text_samples = [s for s in samples if s[1] == 'text']
-    audio_samples = [s for s in samples if s[1] == 'audio']
-    image_samples = [s for s in samples if s[1] == 'image']
-
     if text_samples:
         integrate_text_feedback(text_samples)
     

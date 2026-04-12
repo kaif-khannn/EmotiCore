@@ -22,8 +22,9 @@ def run_text():
     from pipeline.text.preprocess_goemotions  import run as go
     from pipeline.text.preprocess_emotionlines import run as el
     from pipeline.text.preprocess_isear       import run as is_
+    from pipeline.text.preprocess_semeval2018 import run as sm
     from pipeline.text.merge_text             import run as mt
-    go(); el(); is_(); mt()
+    go(); el(); is_(); sm(); mt()
 
 
 def run_audio():
@@ -31,10 +32,8 @@ def run_audio():
     print("  AUDIO MODALITY")
     print("-" * 50)
     from pipeline.audio.preprocess_ravdess import run as rv
-    from pipeline.audio.preprocess_tess    import run as ts
-    from pipeline.audio.preprocess_cremad  import run as cr
     from pipeline.audio.merge_audio        import run as ma
-    rv(); ts(); cr(); ma()
+    rv(); ma()
 
 
 def run_image():
@@ -42,10 +41,11 @@ def run_image():
     print("  IMAGE MODALITY")
     print("-" * 50)
     from pipeline.image.preprocess_fer2013   import run as f2
-    from pipeline.image.preprocess_affectnet import run as an
-    from pipeline.image.preprocess_rafdb     import run as rb
+    # affectnet and rafdb are missing; fer2013 and ckplus are available
+    # ckplus is present in pipeline/image so we can include it
+    from pipeline.image.preprocess_ckplus    import run as ck
     from pipeline.image.merge_image          import run as mi
-    f2(); an(); rb(); mi()
+    f2(); ck(); mi()
 
 
 def run_validate():

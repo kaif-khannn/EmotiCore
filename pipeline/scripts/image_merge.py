@@ -1,7 +1,7 @@
 """
 pipeline/image/merge_image.py
 ------------------------------
-Merges fer2013_meta.csv + affectnet_meta.csv + rafdb_meta.csv,
+Merges fer2013_meta.csv + ckplus_meta.csv (available datasets),
 balances classes via augmentation (rotation, flip, brightness),
 writes final image_dataset.csv.
 """
@@ -55,7 +55,7 @@ def _augment_image(img_path: str, save_path: str) -> bool:
 
 
 def run():
-    sources = ["fer2013_meta.csv", "affectnet_meta.csv", "rafdb_meta.csv"]
+    sources = ["fer2013_meta.csv", "ckplus_meta.csv"]
     frames = []
     for src in sources:
         path = os.path.join(PROC_IMAGE_DIR, src)

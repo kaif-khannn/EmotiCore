@@ -1,34 +1,38 @@
-# ── API ──────────────────────────────────────────────────────────────────────
+# ── API ─────────────────────────────────────────────────────────────────────
 fastapi
-uvicorn
+uvicorn[standard]
 python-multipart
+pydantic
+python-dotenv
 
-# ── ML frameworks ─────────────────────────────────────────────────────────────
+# ── ML Frameworks ────────────────────────────────────────────────────────────
 torch
 transformers
+tensorflow-cpu
 tf-keras
+keras
 
 # ── Audio ─────────────────────────────────────────────────────────────────────
 librosa
 soundfile
+pydub
+static-ffmpeg
 
 # ── Vision ────────────────────────────────────────────────────────────────────
 deepface
 opencv-python-headless
 
-# ── Data pipeline ─────────────────────────────────────────────────────────────
-pandas
+# ── Data Science ──────────────────────────────────────────────────────────────
 numpy
+pandas
 scikit-learn
 imbalanced-learn
+scipy
+joblib
 tqdm
 
-# ── Visualization & reporting ─────────────────────────────────────────────────
-matplotlib
-seaborn
-
-# ── NLP utilities ─────────────────────────────────────────────────────────────
+# ── NLP Utilities ─────────────────────────────────────────────────────────────
 nltk
-
-# ── Optional: HuggingFace datasets (GoEmotions download helper) ───────────────
 datasets
+# ── Pipeline Utilities ────────────────────────────────────────────────────────
+kagglehub

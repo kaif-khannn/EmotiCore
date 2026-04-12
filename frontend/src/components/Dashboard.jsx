@@ -9,7 +9,7 @@ export default function Dashboard() {
 
   const fetchAnalytics = async () => {
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/analytics');
+      const res = await fetch('/api/analytics');
       const data = await res.json();
       setAnalytics(data);
       setError(null);
@@ -104,11 +104,11 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="flex flex-col gap-6 w-full fade-in p-4 xl:p-8 max-w-7xl mx-auto">
+    <div className="flex flex-col gap-4 sm:gap-6 w-full fade-in p-2 sm:p-4 xl:p-8 max-w-7xl mx-auto">
       
       {/* Primary Area Chart */}
-      <div className="obsidian-panel p-8 md:p-10 pb-4 rounded-[2.5rem] w-full min-h-[450px] border-t-white/10 shadow-2xl relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-8 opacity-0 group-hover:opacity-100 transition-opacity">
+      <div className="obsidian-panel p-4 md:p-8 lg:p-10 pb-2 md:pb-4 rounded-3xl md:rounded-[2.5rem] w-full min-h-[350px] md:min-h-[450px] border-t-white/10 shadow-2xl relative overflow-hidden group">
+          <div className="absolute top-0 right-0 p-4 md:p-8 opacity-0 group-hover:opacity-100 transition-opacity">
               <ArrowUpRight className="text-zinc-600" size={32} />
           </div>
           {analytics.emotion_timeseries.length > 0 ? (
@@ -141,11 +141,11 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-2">
         
         {/* Total Inferences */}
-        <div className="obsidian-panel p-8 bg-[#0a0a0a] border-t-white/10 rounded-[2.5rem] flex flex-col justify-between h-[220px] shadow-2xl hover:bg-white/5 transition-all group">
+        <div className="obsidian-panel p-6 md:p-8 bg-[#0a0a0a] border-t-white/10 rounded-3xl md:rounded-[2.5rem] flex flex-col justify-between min-h-[200px] shadow-2xl hover:bg-white/5 transition-all group">
            <div className="flex justify-between items-start">
               <div className="space-y-1">
                  <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold">Total Inferences</span>
-                 <h3 className="text-5xl font-syne text-white tracking-tighter font-extrabold">{analytics.total_inferences.toLocaleString()}</h3>
+                 <h3 className="text-4xl md:text-5xl font-syne text-white tracking-tighter font-extrabold">{analytics.total_inferences.toLocaleString()}</h3>
               </div>
               <div className="px-3 py-1 bg-emerald-500/10 rounded-full text-emerald-400 text-[10px] font-bold uppercase tracking-widest flex items-center gap-1">
                   <div className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></div> Up
@@ -169,11 +169,11 @@ export default function Dashboard() {
         </div>
 
         {/* Avg Confidence */}
-        <div className="obsidian-panel p-8 bg-[#0a0a0a] border-t-white/10 rounded-[2.5rem] flex flex-col justify-between h-[220px] shadow-2xl hover:bg-white/5 transition-all group">
+        <div className="obsidian-panel p-6 md:p-8 bg-[#0a0a0a] border-t-white/10 rounded-3xl md:rounded-[2.5rem] flex flex-col justify-between min-h-[200px] shadow-2xl hover:bg-white/5 transition-all group">
            <div className="flex justify-between items-start">
               <div className="space-y-1">
                  <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold">Avg Confidence</span>
-                 <h3 className="text-5xl font-syne text-white tracking-tighter font-extrabold">{analytics.avg_confidence}%</h3>
+                 <h3 className="text-4xl md:text-5xl font-syne text-white tracking-tighter font-extrabold">{analytics.avg_confidence}%</h3>
               </div>
               <div className="px-3 py-1 bg-cyan-500/10 rounded-full text-cyan-400 text-[10px] font-bold uppercase tracking-widest">
                   Stable
@@ -197,7 +197,7 @@ export default function Dashboard() {
         </div>
 
         {/* Activity Distribution */}
-        <div className="obsidian-panel p-8 bg-[#0a0a0a] border-t-white/10 rounded-[2.5rem] flex flex-col justify-between h-[220px] shadow-2xl hover:bg-white/5 transition-all relative overflow-hidden">
+        <div className="obsidian-panel p-6 md:p-8 bg-[#0a0a0a] border-t-white/10 rounded-3xl md:rounded-[2.5rem] flex flex-col justify-between min-h-[200px] shadow-2xl hover:bg-white/5 transition-all relative overflow-hidden">
            <div className="flex justify-between items-center w-full mb-4">
               <span className="text-zinc-500 text-[10px] uppercase tracking-[0.2em] font-bold">Weekly Distribution</span>
            </div>

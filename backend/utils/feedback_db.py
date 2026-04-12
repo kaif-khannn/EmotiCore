@@ -2,6 +2,9 @@ import sqlite3
 import os
 import json
 from datetime import datetime
+import logging
+
+logger = logging.getLogger("emoticore.feedback")
 
 DB_PATH = os.path.join(os.path.dirname(__file__), "..", "..", "datasets", "feedback", "feedback.db")
 ASSETS_DIR = os.path.join(os.path.dirname(__file__), "..", "..", "datasets", "feedback", "assets")
@@ -39,4 +42,4 @@ def save_feedback(modality, predicted, corrected, input_path=None, raw_input=Non
 
 if __name__ == "__main__":
     init_db()
-    print(f"Feedback database initialized at {DB_PATH}")
+    logger.info(f"Feedback database initialized at {DB_PATH}")

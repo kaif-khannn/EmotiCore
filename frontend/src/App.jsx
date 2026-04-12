@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
 import { Brain, MessageSquare, Mic, Camera, LayoutDashboard, Settings, Code, Menu, X, ChevronLeft, Home, Power, Grid } from 'lucide-react';
 import './index.css';
-
-// Components (We will implement these next)
+// Components
 import Dashboard from './components/Dashboard';
 import TextEmotion from './components/TextEmotion';
 import AudioEmotion from './components/AudioEmotion';
@@ -21,7 +20,7 @@ function App() {
 
   const fetchStatus = async () => {
     try {
-      const resp = await fetch('http://localhost:8000/api/health-check');
+      const resp = await fetch('/api/health-check');
       const data = await resp.json();
       setCoreStatus(data);
     } catch (err) {
@@ -39,7 +38,7 @@ function App() {
   if (!hasStarted) {
     return (
       <div className="w-full relative">
-         {/* Background decoration preserved */}
+         {/* Background decoration */}
          <div className="bg-blob blob-1 fixed"></div>
          <div className="bg-blob blob-2 fixed"></div>
          <div className="bg-blob fixed top-1/3 left-1/4 w-[700px] h-[700px] bg-yellow-500/20 blur-[120px] rounded-full -z-10 mix-blend-screen animate-pulse" style={{ animationDuration: '8s' }}></div>
@@ -62,14 +61,14 @@ function App() {
 
   return (
     <div className="relative w-full min-h-screen bg-[#050505] text-white overflow-x-hidden flex flex-col font-jakarta">
-      {/* Background blobs (Obsidian aesthetic) */}
+      {/* Background blobs */}
       <div className="bg-blob blob-1 fixed opacity-20"></div>
       <div className="bg-blob blob-2 fixed opacity-20"></div>
 
       {/* Top Logo Navbar - Fixed for Scroll Integrity */}
-      <header className="fixed top-0 left-0 w-full px-8 py-6 z-30 flex justify-between items-center bg-gradient-to-b from-[#050505] via-[#050505]/95 to-transparent backdrop-blur-sm border-b border-white/[0.02]">
+      <header className="fixed top-0 left-0 w-full px-4 md:px-8 py-4 md:py-6 z-30 flex justify-between items-center bg-gradient-to-b from-[#050505] via-[#050505]/95 to-transparent backdrop-blur-sm border-b border-white/[0.02]">
          <div className="flex justify-between items-center w-full max-w-7xl mx-auto pointer-events-none">
-            <button onClick={() => handleModuleLoad('home')} className="flex items-center gap-3 hover:opacity-80 transition-opacity pointer-events-auto">
+            <button onClick={() => handleModuleLoad('home')} className="flex items-center gap-3 hover:opacity-80 transition-opacity pointer-events-auto active:scale-95 min-h-[44px]">
                <svg width="0" height="0">
                   <linearGradient id="gradientBrainSidebar" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop stopColor="var(--accent-primary)" offset="0%" />
@@ -77,15 +76,15 @@ function App() {
                   </linearGradient>
                 </svg>
                 <Brain size={36} className="text-transparent drop-shadow-md" style={{ stroke: 'url(#gradientBrainSidebar)' }} />
-                <div className="text-left hidden sm:block">
-                   <h1 className="text-2xl font-extrabold font-syne tracking-tighter leading-none">EMOTICORE</h1>
-                   <p className="text-[10px] text-zinc-500 uppercase tracking-[0.2em] mt-1 font-bold">Multi-Modal AI</p>
+                <div className="text-left hidden sm:block flex flex-col justify-center">
+                   <h1 className="text-xl md:text-2xl font-extrabold font-syne tracking-tighter leading-none">EMOTICORE</h1>
+                   <p className="text-[9px] md:text-[10px] text-zinc-500 uppercase tracking-[0.2em] mt-1 font-bold">Multi-Modal AI</p>
                 </div>
             </button>
             
             {activeModule !== 'home' && (
-                <button onClick={() => handleModuleLoad('home')} className="obsidian-panel px-6 py-3 text-sm flex items-center gap-2 hover:bg-white/5 transition-all font-syne font-bold rounded-full pointer-events-auto border-t-white/10 shadow-2xl">
-                    <ChevronLeft size={18} /> ALL MODULES
+                <button onClick={() => handleModuleLoad('home')} className="obsidian-panel px-4 md:px-6 py-2 md:py-3 text-xs md:text-sm flex items-center gap-1 md:gap-2 hover:bg-white/5 transition-all font-syne font-bold rounded-full pointer-events-auto border-t-white/10 shadow-2xl active:scale-95 min-h-[44px]">
+                    <ChevronLeft size={16} className="md:w-[18px] md:h-[18px]" /> <span className="hidden sm:inline">ALL MODULES</span><span className="sm:hidden">BACK</span>
                 </button>
             )}
          </div>
@@ -97,7 +96,7 @@ function App() {
           {/* Default Home Module View */}
           {activeModule === 'home' && !isLoading && (
                <div className="w-full max-w-6xl flex flex-col items-center justify-center mt-12 md:mt-24 fade-in-up">
-                   <h2 className="text-5xl md:text-7xl font-syne font-extrabold mb-16 text-center tracking-tight">Select Perception <span className="gradient-text">Module</span></h2>
+                   <h2 className="text-4xl sm:text-5xl md:text-7xl font-syne font-extrabold mb-10 md:mb-16 text-center tracking-tight">Select Perception <span className="gradient-text">Module</span></h2>
                    
                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-5xl mx-auto">
                        {/* Text Card */}
@@ -206,9 +205,9 @@ function App() {
       {/* Primary Floating Action Button */}
       <button 
          onClick={() => setSidebarOpen(true)}
-         className="fixed bottom-10 left-10 z-20 w-16 h-16 rounded-2xl obsidian-panel flex items-center justify-center text-white hover:bg-white/5 transition-all hover:scale-105 shadow-2xl border-t-white/10 group"
+         className="fixed bottom-6 lg:bottom-10 left-6 lg:left-10 z-20 w-14 h-14 lg:w-16 lg:h-16 rounded-2xl obsidian-panel flex items-center justify-center text-white hover:bg-white/5 transition-all hover:scale-105 shadow-2xl border-t-white/10 group"
       >
-         <Menu size={28} className="group-hover:text-cyan-400 transition-colors" />
+         <Menu size={24} className="lg:w-7 lg:h-7 group-hover:text-cyan-400 transition-colors" />
       </button>
 
       {/* Navigation Sidebar */}
