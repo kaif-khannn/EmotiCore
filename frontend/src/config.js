@@ -1,19 +1,13 @@
 /**
- * frontend/src/config.js
- * ---------------------
- * Centralized API configuration for the EmotiCore frontend.
+ * Centralized API configuration for EmotiCore.
+ * Prepend this to all API calls to ensure they hit the correct backend.
  */
 
-// Toggle this between local development and production
-// In a real CI/CD environment, this would be an environment variable (import.meta.env.VITE_API_URL)
-const IS_PRODUCTION = true; 
+// We use an empty string in development if we want to rely on the Vite proxy,
+// or a hardcoded URL to bypass the proxy entirely.
+// For production transparency, we default to the Render URL.
+export const API_BASE_URL = 'https://emoticore.onrender.com';
 
-export const API_BASE_URL = IS_PRODUCTION 
-    ? 'https://emoticore.onrender.com' 
-    : 'http://127.0.0.1:8000';
-
-export const getApiUrl = (path) => {
-    // Ensure path starts with a slash
-    const normalizedPath = path.startsWith('/') ? path : `/${path}`;
-    return `${API_BASE_URL}${normalizedPath}`;
+export default {
+  API_BASE_URL,
 };

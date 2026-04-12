@@ -7,7 +7,7 @@ import TextEmotion from './components/TextEmotion';
 import AudioEmotion from './components/AudioEmotion';
 import ImageEmotion from './components/ImageEmotion';
 import LandingPage from './components/LandingPage';
-import { getApiUrl } from './config';
+import { API_BASE_URL } from './config';
 
 function App() {
   // Load initial state from localStorage to prevent reset on reload
@@ -23,7 +23,7 @@ function App() {
 
   const fetchStatus = async () => {
     try {
-      const resp = await fetch(getApiUrl('/api/health-check'));
+      const resp = await fetch(`${API_BASE_URL}/api/health-check`);
       const data = await resp.json();
       setCoreStatus(data);
     } catch (err) {
@@ -36,7 +36,7 @@ function App() {
     if (modality === 'image') setActivatingImage(true);
     
     try {
-       await fetch(getApiUrl(`/api/activate/${modality}`), { method: 'POST' });
+       await fetch(`${API_BASE_URL}/api/activate/${modality}`, { method: 'POST' });
        await fetchStatus();
     } catch (err) {
        console.error(`Failed to activate ${modality}:`, err);

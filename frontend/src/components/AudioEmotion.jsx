@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import { Mic, Square, Upload, Play, Zap, Brain } from 'lucide-react';
-import { getApiUrl } from '../config';
+import { API_BASE_URL } from '../config';
 
 export default function AudioEmotion({ onReturnHome }) {
   const [recording, setRecording] = useState(false);
@@ -15,7 +15,7 @@ export default function AudioEmotion({ onReturnHome }) {
 
   const handleFeedback = async (isCorrect, correction = null) => {
     try {
-      await fetch(getApiUrl('/api/feedback'), {
+      await fetch(`${API_BASE_URL}/api/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -92,7 +92,7 @@ export default function AudioEmotion({ onReturnHome }) {
       const formData = new FormData();
       formData.append('file', fetchRes, 'audio.wav');
 
-      const response = await axios.post(getApiUrl('/api/predict/audio'), formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/predict/audio`, formData, {
          headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (response.data.error) {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Send, Zap, Brain, MessageSquare, ArrowLeft, Activity, LayoutGrid } from 'lucide-react';
-import { getApiUrl } from '../config';
+import { API_BASE_URL } from '../config';
 
 export default function TextEmotion({ onReturnHome }) {
   const [text, setText] = useState('');
@@ -13,7 +13,7 @@ export default function TextEmotion({ onReturnHome }) {
 
   const handleFeedback = async (isCorrect, correction = null) => {
     try {
-      await fetch(getApiUrl('/api/feedback'), {
+      await fetch(`${API_BASE_URL}/api/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -34,7 +34,7 @@ export default function TextEmotion({ onReturnHome }) {
     if (!text.trim()) return;
     setViewState('processing');
     try {
-      const response = await fetch(getApiUrl('/api/predict/text'), {
+      const response = await fetch(`${API_BASE_URL}/api/predict/text`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text })

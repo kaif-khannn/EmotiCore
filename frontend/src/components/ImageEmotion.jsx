@@ -1,7 +1,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import axios from 'axios';
 import { Camera, StopCircle, ScanFace, Activity, Upload, Image as ImageIcon, Zap } from 'lucide-react';
-import { getApiUrl } from '../config';
+import { API_BASE_URL } from '../config';
 
 export default function ImageEmotion({ onReturnHome }) {
   const [viewState, setViewState] = useState('idle'); // 'idle', 'live', 'preview', 'processing', 'result'
@@ -14,7 +14,7 @@ export default function ImageEmotion({ onReturnHome }) {
 
   const handleFeedback = async (isCorrect, correction = null) => {
     try {
-      await fetch(getApiUrl('/api/feedback'), {
+      await fetch(`${API_BASE_URL}/api/feedback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -93,7 +93,7 @@ export default function ImageEmotion({ onReturnHome }) {
       formData.append('file', blob, 'frame.jpg');
 
       try {
-        const response = await axios.post(getApiUrl('/api/predict/image'), formData, {
+        const response = await axios.post(`${API_BASE_URL}/api/predict/image`, formData, {
            headers: { 'Content-Type': 'multipart/form-data' }
         });
         const data = response.data;
@@ -127,7 +127,7 @@ export default function ImageEmotion({ onReturnHome }) {
       const formData = new FormData();
       formData.append('file', file, 'upload.jpg');
 
-      const response = await axios.post(getApiUrl('/api/predict/image'), formData, {
+      const response = await axios.post(`${API_BASE_URL}/api/predict/image`, formData, {
          headers: { 'Content-Type': 'multipart/form-data' }
       });
       if (response.data.error) throw new Error(response.data.error);
