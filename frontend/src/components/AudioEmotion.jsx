@@ -102,7 +102,7 @@ export default function AudioEmotion({ onReturnHome }) {
       setTimeout(() => { setViewState('result'); }, 1500);
     } catch (err) {
       console.error('Audio analysis failed:', err);
-      const msg = err.response?.data?.error || err.response?.data?.detail || err.message || 'Backend unreachable.';
+      const msg = err.response?.data?.error || err.response?.data?.detail || err.message || 'Remote Backend unreachable. Neural Core may be initializing.';
       setResult({ error: true, message: msg });
       setViewState('result');
     }

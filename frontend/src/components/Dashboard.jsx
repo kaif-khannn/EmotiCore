@@ -16,7 +16,7 @@ export default function Dashboard() {
       setError(null);
     } catch (err) {
       console.error('Analytics fetch failed:', err);
-      setError('Could not connect to backend. Ensure the server is running on port 8000.');
+      setError('Could not connect to backend. The Remote Neural Core may be initializing.');
     } finally {
       setLoading(false);
     }

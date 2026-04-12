@@ -103,7 +103,7 @@ export default function ImageEmotion({ onReturnHome }) {
         setTimeout(() => setViewState('result'), 1200);
       } catch (err) {
         console.error("Backend Error:", err);
-        const msg = err.response?.data?.error || err.response?.data?.detail || err.message || 'Backend unreachable.';
+        const msg = err.response?.data?.error || err.response?.data?.detail || err.message || 'Remote Backend unreachable. Neural Core may be initializing.';
         setGlobalResult({ error: true, message: msg });
         setViewState('result');
       }

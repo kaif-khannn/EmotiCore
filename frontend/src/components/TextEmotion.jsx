@@ -49,7 +49,7 @@ export default function TextEmotion({ onReturnHome }) {
       setTimeout(() => { setViewState('result'); }, 1500);
     } catch (error) {
       console.error('Text analysis failed:', error);
-      setResult({ error: true, message: error.message || 'Backend unreachable. Ensure the server is running on port 8000.' });
+      setResult({ error: true, message: error.message || 'Remote Backend unreachable. The Neural Core may be warming up on Render.' });
       setViewState('result');
     }
   };
