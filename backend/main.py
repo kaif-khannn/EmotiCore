@@ -36,13 +36,12 @@ app = FastAPI(
 # ── CORS ───────────────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
-    allow_origin_regex=r"https://.*\.pages\.dev",
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-logger.info("CORS origins: %s", CORS_ORIGINS)
+logger.info("CORS successfully configured with wildcard allow_origins")
 
 # ── Global exception handler ───────────────────────────────────────────────────
 @app.exception_handler(Exception)
