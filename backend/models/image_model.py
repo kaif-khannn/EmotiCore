@@ -1,7 +1,5 @@
-import numpy as np
-import cv2
-import io
 import os
+import io
 import logging
 
 logger = logging.getLogger("emoticore.image")
@@ -19,6 +17,7 @@ def _load_custom_image_model():
             try:
                 import tensorflow as tf
                 from tensorflow import keras
+                import cv2
                 _CUSTOM_MODEL = keras.models.load_model(local_path)
                 _FACE_CASCADE = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
                 logger.info(f"Custom local image model (.keras) loaded successfully from {local_path}")
@@ -35,6 +34,9 @@ def get_status() -> dict:
     }
 
 def predict_image_emotion(image_bytes: bytes) -> dict:
+    import numpy as np
+    import cv2
+    
     try:
         # Decode the bytes directly to a numpy array (cv2 image)
         np_arr = np.frombuffer(image_bytes, np.uint8)
@@ -52,6 +54,7 @@ def predict_image_emotion(image_bytes: bytes) -> dict:
             raw_faces = _FACE_CASCADE.detectMultiScale(gray, scaleFactor=1.1, minNeighbors=5, minSize=(30, 30))
             
             for (x, y, w, h) in raw_faces:
+                # Filter out full-image false positives
                 if w >= img.shape[1] - 5 and h >= img.shape[0] - 5:
                     continue
                 
@@ -85,6 +88,7 @@ def predict_image_emotion(image_bytes: bytes) -> dict:
             }
         else:
             from deepface import DeepFace
+            # Use OpenCV explicitly as detector backend
             raw_results = DeepFace.analyze(img, actions=['emotion'], enforce_detection=False, detector_backend='opencv')
             if not isinstance(raw_results, list):
                 raw_results = [raw_results]
@@ -115,4 +119,5 @@ def predict_image_emotion(image_bytes: bytes) -> dict:
                 "breakdown": faces_output[0]["breakdown"] if faces_output else {}
             }
     except Exception as e:
+        logger.error(f"Image prediction failed: {e}")
         return {"error": str(e), "modality": "image", "emotion": "Unknown", "confidence": 0}

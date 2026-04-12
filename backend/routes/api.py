@@ -2,10 +2,6 @@ from fastapi import APIRouter, File, UploadFile, Form
 from pydantic import BaseModel
 from typing import Optional, Dict, Any
 
-from models.text_model import predict_text_emotion
-from models.audio_model import predict_audio_emotion, get_status as get_audio_status, _load_model as load_audio_model
-from models.image_model import predict_image_emotion, get_status as get_image_status, _load_custom_image_model as load_image_model
-from models.fusion import aggregate_predictions
 from models.analytics_store import log_inference, get_analytics
 from utils.serialization import to_python_types
 
@@ -21,6 +17,9 @@ router.include_router(feedback_router)
 @router.get("/health-check", response_model=HealthCheckResponse)
 async def get_system_status():
     """Return the status of the underlying emotion recognition models."""
+    from models.audio_model import get_status as get_audio_status
+    from models.image_model import get_status as get_image_status
+    
     logger.debug("Health check requested")
     return {
         "audio": get_audio_status(),
@@ -32,9 +31,11 @@ async def get_system_status():
 async def activate_modality(modality: str):
     import asyncio
     if modality == "audio":
+        from models.audio_model import _load_model as load_audio_model
         await asyncio.to_thread(load_audio_model)
         return {"status": "activated", "modality": modality}
     elif modality == "image":
+        from models.image_model import _load_custom_image_model as load_image_model
         await asyncio.to_thread(load_image_model)
         return {"status": "activated", "modality": modality}
     return {"error": "Invalid modality"}
@@ -45,6 +46,7 @@ class TextInput(BaseModel):
 @router.post("/predict/text", response_model=PredictionResponse)
 async def predict_text(input_data: TextInput):
     """Predict emotion from provided text."""
+    from models.text_model import predict_text_emotion
     result = predict_text_emotion(input_data.text)
     if "error" not in result:
         log_inference("text", result.get("emotion", "Unknown"), float(result.get("confidence", 0)))
@@ -53,6 +55,7 @@ async def predict_text(input_data: TextInput):
 @router.post("/predict/audio", response_model=PredictionResponse)
 async def predict_audio(file: UploadFile = File(...)):
     """Predict emotion from provided audio file (.wav)."""
+    from models.audio_model import predict_audio_emotion
     audio_bytes = await file.read()
     result = predict_audio_emotion(audio_bytes)
     if "error" not in result:
@@ -62,6 +65,7 @@ async def predict_audio(file: UploadFile = File(...)):
 @router.post("/predict/image", response_model=PredictionResponse)
 async def predict_image(file: UploadFile = File(...)):
     """Predict emotion from provided image file."""
+    from models.image_model import predict_image_emotion
     image_bytes = await file.read()
     result = predict_image_emotion(image_bytes)
     if "error" not in result:
@@ -84,6 +88,11 @@ async def predict_fusion(
     """
     Combines up to three modalities and returns a weighted prediction.
     """
+    from models.text_model import predict_text_emotion
+    from models.audio_model import predict_audio_emotion
+    from models.image_model import predict_image_emotion
+    from models.fusion import aggregate_predictions
+    
     predictions = {}
     
     if text:
@@ -104,4 +113,3 @@ async def predict_fusion(
     if "error" not in fused_result:
         log_inference("fusion", fused_result.get("emotion", "Unknown"), float(fused_result.get("confidence", 0)))
     return to_python_types(fused_result)
-

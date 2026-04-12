@@ -61,15 +61,12 @@ async def startup_event():
         init_db()
         logger.info("Feedback database initialised successfully.")
         
-        import asyncio
-        from models.text_model import get_classifier
+        # async def preload_models():
+        #     logger.info("Background model pre-loading started... (Text only)")
+        #     await asyncio.to_thread(get_classifier)
+        #     logger.info("Background model pre-loading complete.")
 
-        async def preload_models():
-            logger.info("Background model pre-loading started... (Text only)")
-            await asyncio.to_thread(get_classifier)
-            logger.info("Background model pre-loading complete.")
-
-        asyncio.create_task(preload_models())
+        # asyncio.create_task(preload_models())
     except Exception as exc:
         logger.warning("Could not initialise startup tasks: %s", exc)
 
@@ -89,4 +86,4 @@ def read_root():
 if __name__ == "__main__":
     logger.info("Starting EmotiCore backend on %s:%s (debug=%s)", HOST, PORT, DEBUG)
     # Enable reload by default for better dev experience
-    uvicorn.run("main:app", host=HOST, port=PORT, reload=True)
+    uvicorn.run("main:app", host=HOST, port=PORT, reload=False)

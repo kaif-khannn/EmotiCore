@@ -1,6 +1,6 @@
 import os
 import joblib
-from transformers import pipeline
+# from transformers import pipeline # Moved inside get_classifier for lazy loading
 import logging
 
 logger = logging.getLogger("emoticore.text")
@@ -24,6 +24,7 @@ def get_classifier():
 
         try:
             logger.info("Loading Hugging Face text model (distilroberta)... This may take a moment.")
+            from transformers import pipeline
             _classifier = pipeline("text-classification", model="j-hartmann/emotion-english-distilroberta-base", return_all_scores=True)
             _model_format = "huggingface"
             logger.info("Hugging Face text model loaded successfully.")

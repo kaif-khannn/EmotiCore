@@ -1,11 +1,5 @@
-import io
-import tempfile
 import os
-import numpy as np
 import joblib
-import librosa
-from pydub import AudioSegment
-import static_ffmpeg
 import logging
 
 logger = logging.getLogger("emoticore.audio")
@@ -25,10 +19,12 @@ def _load_model():
     global _AUDIO_MODEL, _AUDIO_LABELS, _AUDIO_SCALER
     if _AUDIO_MODEL is None:
         if os.path.exists(MODEL_PATH):
+            import static_ffmpeg
+            static_ffmpeg.add_paths() # Initialize ffmpeg once during model load
+            
             _AUDIO_MODEL = joblib.load(MODEL_PATH)
             _AUDIO_LABELS = joblib.load(LABELS_PATH)
             _AUDIO_SCALER = joblib.load(SCALER_PATH)
-            static_ffmpeg.add_paths() # Initialize ffmpeg once during model load
             logger.info(f"Audio ML model loaded successfully from {MODEL_PATH}")
         else:
             logger.warning(f"Audio model weights not found at {MODEL_PATH}. Falling back to heuristic.")
@@ -42,6 +38,12 @@ def get_status() -> dict:
     }
 
 def predict_audio_emotion(audio_bytes: bytes) -> dict:
+    import io
+    import tempfile
+    import numpy as np
+    import librosa
+    from pydub import AudioSegment
+    
     try:
         _load_model()
 
@@ -70,6 +72,8 @@ def predict_audio_emotion(audio_bytes: bytes) -> dict:
             return {"error": "Empty or unreadable audio", "modality": "audio", "emotion": "Unknown", "confidence": 0}
 
         audio_data, _ = librosa.effects.trim(audio_data, top_db=30)
+        
+        # Baseline check
         rms_val = np.mean(librosa.feature.rms(y=audio_data))
         if rms_val < 0.002:
             return {
@@ -83,6 +87,7 @@ def predict_audio_emotion(audio_bytes: bytes) -> dict:
         if len(audio_data) < target_len:
             audio_data = np.pad(audio_data, (0, target_len - len(audio_data)))
 
+        # Feature Extraction using librosa
         mfcc = librosa.feature.mfcc(y=audio_data, sr=sr, n_mfcc=40)
         mfcc_mean = np.mean(mfcc, axis=1)
         mfcc_std  = np.std(mfcc, axis=1)
@@ -141,6 +146,5 @@ def predict_audio_emotion(audio_bytes: bytes) -> dict:
             return {"error": "Model not loaded", "modality": "audio", "emotion": "Unknown", "confidence": 0}
 
     except Exception as e:
-        import traceback
-        traceback.print_exc()
+        logger.error(f"Audio prediction failed: {e}")
         return {"error": str(e), "modality": "audio", "emotion": "Unknown", "confidence": 0}
