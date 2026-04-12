@@ -29,7 +29,7 @@ class NumPyJSONResponse(JSONResponse):
 app = FastAPI(
     title="EmotiCore — Multi-Modal Emotion Detection API",
     description="Detect emotions from Text, Speech, and Facial Expressions",
-    version="1.0.0",
+    version="1.0.1",
     default_response_class=NumPyJSONResponse,
 )
 
