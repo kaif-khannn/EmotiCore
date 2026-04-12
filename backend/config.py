@@ -24,7 +24,7 @@ DEBUG: bool = os.getenv("DEBUG", "false").lower() in ("1", "true", "yes")
 #   CORS_ORIGINS=http://localhost:5173,https://your-production-domain.com
 _cors_raw: str = os.getenv(
     "CORS_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173,https://emoticore.pages.dev"
+    "http://localhost:5173,http://127.0.0.1:5173"
 )
 CORS_ORIGINS: list[str] = [o.strip() for o in _cors_raw.split(",") if o.strip()]
 
