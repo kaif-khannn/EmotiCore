@@ -35,10 +35,9 @@ def _load_model():
 
 def get_status() -> dict:
     global _AUDIO_MODEL
-    _load_model()
     return {
         "active": _AUDIO_MODEL is not None,
-        "type": "Custom SVM Ensemble" if _AUDIO_MODEL is not None else "Heuristic Fallback",
+        "type": "Custom SVM Ensemble" if _AUDIO_MODEL is not None else "Offline",
         "size": "122MB" if _AUDIO_MODEL is not None else "N/A"
     }
 

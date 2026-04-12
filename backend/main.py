@@ -61,17 +61,12 @@ async def startup_event():
         init_db()
         logger.info("Feedback database initialised successfully.")
         
-        # Pre-load models in background to avoid initial request timeouts
         import asyncio
         from models.text_model import get_classifier
-        from models.audio_model import get_status as get_audio_status
-        from models.image_model import get_status as get_image_status
 
         async def preload_models():
-            logger.info("Background model pre-loading started...")
+            logger.info("Background model pre-loading started... (Text only)")
             await asyncio.to_thread(get_classifier)
-            await asyncio.to_thread(get_audio_status)
-            await asyncio.to_thread(get_image_status)
             logger.info("Background model pre-loading complete.")
 
         asyncio.create_task(preload_models())

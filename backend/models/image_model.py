@@ -28,7 +28,6 @@ def _load_custom_image_model():
 
 def get_status() -> dict:
     global _CUSTOM_MODEL
-    _load_custom_image_model()
     return {
         "active": _CUSTOM_MODEL is not None,
         "type": "Neural Architecture (MobileNetV2)" if _CUSTOM_MODEL is not None else "DeepFace Standard",

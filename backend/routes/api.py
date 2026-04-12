@@ -3,8 +3,8 @@ from pydantic import BaseModel
 from typing import Optional, Dict, Any
 
 from models.text_model import predict_text_emotion
-from models.audio_model import predict_audio_emotion, get_status as get_audio_status
-from models.image_model import predict_image_emotion, get_status as get_image_status
+from models.audio_model import predict_audio_emotion, get_status as get_audio_status, _load_model as load_audio_model
+from models.image_model import predict_image_emotion, get_status as get_image_status, _load_custom_image_model as load_image_model
 from models.fusion import aggregate_predictions
 from models.analytics_store import log_inference, get_analytics
 from utils.serialization import to_python_types
@@ -27,6 +27,17 @@ async def get_system_status():
         "image": get_image_status(),
         "system": "Operational"
     }
+
+@router.post("/activate/{modality}")
+async def activate_modality(modality: str):
+    import asyncio
+    if modality == "audio":
+        await asyncio.to_thread(load_audio_model)
+        return {"status": "activated", "modality": modality}
+    elif modality == "image":
+        await asyncio.to_thread(load_image_model)
+        return {"status": "activated", "modality": modality}
+    return {"error": "Invalid modality"}
 
 class TextInput(BaseModel):
     text: str

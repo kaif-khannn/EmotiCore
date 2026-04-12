@@ -17,6 +17,8 @@ function App() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [sidebarTab, setSidebarTab] = useState('analytics');
   const [coreStatus, setCoreStatus] = useState(null);
+  const [activatingAudio, setActivatingAudio] = useState(false);
+  const [activatingImage, setActivatingImage] = useState(false);
 
   const fetchStatus = async () => {
     try {
@@ -25,6 +27,21 @@ function App() {
       setCoreStatus(data);
     } catch (err) {
       console.error("Failed to fetch core status", err);
+    }
+  };
+
+  const handleActivate = async (modality) => {
+    if (modality === 'audio') setActivatingAudio(true);
+    if (modality === 'image') setActivatingImage(true);
+    
+    try {
+       await fetch(`/api/activate/${modality}`, { method: 'POST' });
+       await fetchStatus();
+    } catch (err) {
+       console.error(`Failed to activate ${modality}:`, err);
+    } finally {
+       if (modality === 'audio') setActivatingAudio(false);
+       if (modality === 'image') setActivatingImage(false);
     }
   };
 
@@ -162,12 +179,20 @@ function App() {
                            </div>
                        </div>
                        
-                       <div className="obsidian-card p-10 flex flex-col gap-8 hover:bg-white/5 transition-all border-l-4 border-l-rose-500/50" style={{animationDelay: '0.1s'}}>
+                       <div 
+                           onClick={() => { if (!coreStatus?.audio?.active && !activatingAudio) handleActivate('audio'); }}
+                           className={`obsidian-card p-10 flex flex-col gap-8 transition-all border-l-4 border-l-rose-500/50 ${!coreStatus?.audio?.active ? 'opacity-60 hover:opacity-100 cursor-pointer hover:bg-white/5' : ''}`} 
+                           style={{animationDelay: '0.1s'}}
+                       >
                            <div className="flex justify-between items-start">
-                               <div className="w-16 h-16 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400"><Mic size={32}/></div>
-                               <div className={`flex items-center gap-2 px-3 py-1 ${coreStatus?.audio?.active ? 'bg-emerald-500/10' : 'bg-amber-500/10'} rounded-full`}>
-                                  <div className={`w-2 h-2 rounded-full ${coreStatus?.audio?.active ? 'bg-emerald-400 shadow-[0_0_8px_#34c759]' : 'bg-amber-400 shadow-[0_0_8px_#ff9500]'} animate-pulse`}></div>
-                                  <span className={`${coreStatus?.audio?.active ? 'text-emerald-400' : 'text-amber-400'} text-[10px] uppercase tracking-widest font-bold`}>{coreStatus?.audio?.active ? 'High Fidelity' : 'Standard'}</span>
+                               <div className="w-16 h-16 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400">
+                                  {activatingAudio ? <div className="w-8 h-8 rounded-full border-4 border-rose-500/30 border-t-rose-400 animate-spin"></div> : <Mic size={32}/>}
+                               </div>
+                               <div className={`flex items-center gap-2 px-3 py-1 ${coreStatus?.audio?.active ? 'bg-emerald-500/10' : 'bg-zinc-500/10'} rounded-full transition-colors`}>
+                                  <div className={`w-2 h-2 rounded-full ${coreStatus?.audio?.active ? 'bg-emerald-400 shadow-[0_0_8px_#34c759] animate-pulse' : 'bg-zinc-500'}`}></div>
+                                  <span className={`${coreStatus?.audio?.active ? 'text-emerald-400' : 'text-zinc-400'} text-[10px] uppercase tracking-widest font-bold`}>
+                                      {coreStatus?.audio?.active ? 'Live' : (activatingAudio ? 'Loading...' : 'Standby - Click to Wake')}
+                                  </span>
                                </div>
                            </div>
                            <div>
@@ -175,17 +200,25 @@ function App() {
                              <p className="text-zinc-500 mt-4 leading-relaxed">
                                 {coreStatus?.audio?.active 
                                     ? `Direct spectral analysis active. ${coreStatus.audio.type} loaded (${coreStatus.audio.size}).`
-                                    : "Acoustic extraction active. VAD filtering engaged."}
+                                    : "Model offline to conserve memory. Click this card to load the model into VRAM."}
                              </p>
                            </div>
                        </div>
 
-                       <div className="obsidian-card p-10 flex flex-col gap-8 hover:bg-white/5 transition-all border-l-4 border-l-amber-500/50" style={{animationDelay: '0.2s'}}>
+                       <div 
+                           onClick={() => { if (!coreStatus?.image?.active && !activatingImage) handleActivate('image'); }}
+                           className={`obsidian-card p-10 flex flex-col gap-8 transition-all border-l-4 border-l-amber-500/50 ${!coreStatus?.image?.active ? 'opacity-60 hover:opacity-100 cursor-pointer hover:bg-white/5' : ''}`}
+                           style={{animationDelay: '0.2s'}}
+                       >
                            <div className="flex justify-between items-start">
-                               <div className="w-16 h-16 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400"><Camera size={32}/></div>
-                               <div className={`flex items-center gap-2 px-3 py-1 ${coreStatus?.image?.active ? 'bg-emerald-500/10' : 'bg-amber-500/10'} rounded-full`}>
-                                  <div className={`w-2 h-2 rounded-full ${coreStatus?.image?.active ? 'bg-emerald-400 shadow-[0_0_8px_#34c759]' : 'bg-amber-400 shadow-[0_0_8px_#ff9500]'} animate-pulse`}></div>
-                                  <span className={`${coreStatus?.image?.active ? 'text-emerald-400' : 'text-amber-400'} text-[10px] uppercase tracking-widest font-bold`}>{coreStatus?.image?.active ? 'Optimized' : 'Training...'}</span>
+                               <div className="w-16 h-16 rounded-xl bg-amber-500/10 flex items-center justify-center text-amber-400">
+                                   {activatingImage ? <div className="w-8 h-8 rounded-full border-4 border-amber-500/30 border-t-amber-400 animate-spin"></div> : <Camera size={32}/>}
+                               </div>
+                               <div className={`flex items-center gap-2 px-3 py-1 ${coreStatus?.image?.active ? 'bg-emerald-500/10' : 'bg-zinc-500/10'} rounded-full transition-colors`}>
+                                  <div className={`w-2 h-2 rounded-full ${coreStatus?.image?.active ? 'bg-emerald-400 shadow-[0_0_8px_#34c759] animate-pulse' : 'bg-zinc-500'}`}></div>
+                                  <span className={`${coreStatus?.image?.active ? 'text-emerald-400' : 'text-zinc-400'} text-[10px] uppercase tracking-widest font-bold`}>
+                                       {coreStatus?.image?.active ? 'Live' : (activatingImage ? 'Loading...' : 'Standby - Click to Wake')}
+                                  </span>
                                </div>
                            </div>
                            <div>
@@ -193,7 +226,7 @@ function App() {
                              <p className="text-zinc-500 mt-4 leading-relaxed">
                                 {coreStatus?.image?.active 
                                     ? `${coreStatus.image.type} active. ${coreStatus.image.details}.`
-                                    : "Retraining in progress. Secondary DeepFace extractor is currently active."}
+                                    : "Model offline to conserve memory. Click this card to load the model into VRAM."}
                              </p>
                            </div>
                        </div>
