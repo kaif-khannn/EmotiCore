@@ -279,7 +279,7 @@ function App() {
                           className="obsidian-card p-6 flex items-center justify-between w-full hover:bg-white/5 transition-all group border-transparent hover:border-cyan-500/30"
                        >
                           <div className="flex items-center gap-5">
-                            <Grid className="text-zinc-500 group-hover:text-cyan-400 transition-colors" size={28}/> 
+                            <LayoutGrid className="text-zinc-500 group-hover:text-cyan-400 transition-colors" size={28}/> 
                             <span className="font-bold text-lg text-zinc-300 group-hover:text-white transition-colors">All Modules</span>
                           </div>
                        </button>
