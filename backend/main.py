@@ -82,7 +82,7 @@ def direct_check():
 
 @app.get("/", tags=["health"])
 def read_root():
-    return {"message": "EmotiCore API is running", "docs": "/docs"}
+    return {"message": "EmotiCore API is running", "version": "1.0.1", "docs": "/docs"}
 
 # ── Entrypoint ─────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
