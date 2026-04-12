@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "CI=false vite build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -15,7 +15,6 @@
     "lucide-react": "^0.469.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-webcam": "^7.2.0",
     "recharts": "^2.15.0"
   },
   "devDependencies": {

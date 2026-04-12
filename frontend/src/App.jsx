@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Brain, MessageSquare, Mic, Camera, LayoutDashboard, Settings, Code, Menu, X, ChevronLeft, Home, Power, Grid } from 'lucide-react';
+import { Brain, MessageSquare, Mic, Camera, LayoutDashboard, Settings, Code, Menu, X, ChevronLeft, Home, Power, LayoutGrid } from 'lucide-react';
 import './index.css';
 // Components
 import Dashboard from './components/Dashboard';
