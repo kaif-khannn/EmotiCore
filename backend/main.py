@@ -47,7 +47,9 @@ logger.info("CORS origins: %s", CORS_ORIGINS)
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
     logger.exception("Unhandled exception on %s %s", request.method, request.url)
-    return JSONResponse(
+    # Use standard JSONResponse to avoid recursion if NumPy conversion fails
+    from fastapi.responses import JSONResponse as BaseJSONResponse
+    return BaseJSONResponse(
         status_code=500,
         content={"error": str(exc), "detail": "Internal server error"},
     )
