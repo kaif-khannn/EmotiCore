@@ -14,35 +14,35 @@ SCALER_PATH = os.path.join(MODEL_DIR, "audio_scaler.joblib")
 _AUDIO_MODEL = None
 _AUDIO_LABELS = None
 _AUDIO_SCALER = None
-_LOAD_ERROR = None
+_AUDIO_LOAD_WARNING = None
 
 def _load_model():
-    global _AUDIO_MODEL, _AUDIO_LABELS, _AUDIO_SCALER, _LOAD_ERROR
+    global _AUDIO_MODEL, _AUDIO_LABELS, _AUDIO_SCALER, _AUDIO_LOAD_WARNING
     if _AUDIO_MODEL is None:
         try:
             if os.path.exists(MODEL_PATH):
                 import static_ffmpeg
-                static_ffmpeg.add_paths() # Initialize ffmpeg once during model load
+                static_ffmpeg.add_paths() 
                 
                 _AUDIO_MODEL = joblib.load(MODEL_PATH)
                 _AUDIO_LABELS = joblib.load(LABELS_PATH)
                 _AUDIO_SCALER = joblib.load(SCALER_PATH)
                 logger.info(f"Audio ML model loaded successfully from {MODEL_PATH}")
-                _LOAD_ERROR = None
+                _AUDIO_LOAD_WARNING = None
             else:
-                _LOAD_ERROR = "Model weights not found on server."
+                _AUDIO_LOAD_WARNING = "Model weights not found. Using heuristic fallback."
                 logger.warning(f"Audio model weights not found at {MODEL_PATH}.")
         except Exception as e:
-            _LOAD_ERROR = str(e)
+            _AUDIO_LOAD_WARNING = str(e)
             logger.error(f"Failed to load audio model: {e}")
 
 def get_status() -> dict:
-    global _AUDIO_MODEL, _LOAD_ERROR
+    global _AUDIO_MODEL, _AUDIO_LOAD_WARNING
     return {
-        "active": _AUDIO_MODEL is not None,
-        "type": "Custom SVM Ensemble" if _AUDIO_MODEL is not None else "Offline",
+        "active": True, # Always active because heuristic is a built-in fallback
+        "type": "Custom SVM Ensemble" if _AUDIO_MODEL is not None else "Heuristic Core",
         "size": "122MB" if _AUDIO_MODEL is not None else "N/A",
-        "error": _LOAD_ERROR
+        "warning": _AUDIO_LOAD_WARNING
     }
 
 def predict_audio_emotion(audio_bytes: bytes) -> dict:

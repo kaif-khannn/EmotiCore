@@ -46,8 +46,9 @@ function App() {
          }));
          
          if (data.core_status.error) {
-            alert(`Neural Core Error (${modality}): ${data.core_status.error}`);
+            alert(`Neural Core Critical Error (${modality}): ${data.core_status.error}`);
          }
+         // Warnings are handled in the status UI, not as intrusive alerts
        } else {
          await fetchStatus();
        }
