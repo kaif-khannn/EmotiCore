@@ -9,7 +9,7 @@ const isLocal = window.location.hostname === 'localhost' || window.location.host
 
 export const API_BASE_URL = isLocal 
   ? 'http://localhost:8000' 
-  : 'https://emoticore.onrender.com';
+  : 'https://kaifkhan77-emoticore-api.hf.space';
 
 export default {
   API_BASE_URL,
