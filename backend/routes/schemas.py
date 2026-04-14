@@ -14,7 +14,7 @@ class PredictionResponse(BaseModel):
     modality: str
     emotion: str
     confidence: float
-    breakdown: Dict[str, float]
+    breakdown: Optional[Dict[str, float]] = None
     region: Optional[Dict[str, int]] = None
     faces: Optional[List[Dict[str, Any]]] = None
     error: Optional[str] = None
