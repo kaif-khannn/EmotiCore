@@ -36,10 +36,24 @@ function App() {
     if (modality === 'image') setActivatingImage(true);
     
     try {
-       await fetch(`${API_BASE_URL}/api/activate/${modality}`, { method: 'POST' });
-       await fetchStatus();
+       const resp = await fetch(`${API_BASE_URL}/api/activate/${modality}`, { method: 'POST' });
+       const data = await resp.json();
+       
+       if (data.core_status) {
+         setCoreStatus(prev => ({
+           ...prev,
+           [modality]: data.core_status
+         }));
+         
+         if (data.core_status.error) {
+            alert(`Neural Core Error (${modality}): ${data.core_status.error}`);
+         }
+       } else {
+         await fetchStatus();
+       }
     } catch (err) {
        console.error(`Failed to activate ${modality}:`, err);
+       alert(`Connectivity Error: Could not reach the Neural Core to wake ${modality}.`);
     } finally {
        if (modality === 'audio') setActivatingAudio(false);
        if (modality === 'image') setActivatingImage(false);

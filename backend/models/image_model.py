@@ -6,31 +6,38 @@ logger = logging.getLogger("emoticore.image")
 
 _CUSTOM_MODEL = None
 _CUSTOM_MODE_CHECKED = False
+_IMAGE_LOAD_ERROR = None
 _EMOTIONS = ["happy", "sad", "angry", "fear", "neutral", "surprise", "disgust"]
 _FACE_CASCADE = None
 
 def _load_custom_image_model():
-    global _CUSTOM_MODEL, _CUSTOM_MODE_CHECKED, _FACE_CASCADE
+    global _CUSTOM_MODEL, _CUSTOM_MODE_CHECKED, _FACE_CASCADE, _IMAGE_LOAD_ERROR
     if not _CUSTOM_MODE_CHECKED:
         local_path = os.path.join(os.path.dirname(__file__), "assets", "image_model.keras")
-        if os.path.exists(local_path):
-            try:
+        try:
+            if os.path.exists(local_path):
                 import tensorflow as tf
                 from tensorflow import keras
                 import cv2
                 _CUSTOM_MODEL = keras.models.load_model(local_path)
                 _FACE_CASCADE = cv2.CascadeClassifier(cv2.data.haarcascades + 'haarcascade_frontalface_default.xml')
                 logger.info(f"Custom local image model (.keras) loaded successfully from {local_path}")
-            except Exception as e:
-                logger.warning(f"Found local .keras model at {local_path} but failed to load ({e}). Falling back to DeepFace.")
+                _IMAGE_LOAD_ERROR = None
+            else:
+                _IMAGE_LOAD_ERROR = "Local .keras model file not found."
+                logger.warning(f"Image model weights not found at {local_path}")
+        except Exception as e:
+            _IMAGE_LOAD_ERROR = str(e)
+            logger.warning(f"Found local .keras model at {local_path} but failed to load ({e}). Falling back to DeepFace.")
         _CUSTOM_MODE_CHECKED = True
 
 def get_status() -> dict:
-    global _CUSTOM_MODEL
+    global _CUSTOM_MODEL, _IMAGE_LOAD_ERROR
     return {
         "active": _CUSTOM_MODEL is not None,
         "type": "Neural Architecture (MobileNetV2)" if _CUSTOM_MODEL is not None else "DeepFace Standard",
-        "details": "96x96 Optimization" if _CUSTOM_MODEL is not None else "Standard Inference"
+        "details": "96x96 Optimization" if _CUSTOM_MODEL is not None else "Standard Inference",
+        "error": _IMAGE_LOAD_ERROR
     }
 
 def predict_image_emotion(image_bytes: bytes) -> dict:

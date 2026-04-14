@@ -32,12 +32,14 @@ async def activate_modality(modality: str):
     import asyncio
     if modality == "audio":
         from models.audio_model import _load_model as load_audio_model
+        from models.audio_model import get_status as get_audio_status
         await asyncio.to_thread(load_audio_model)
-        return {"status": "activated", "modality": modality}
+        return {"status": "processed", "modality": modality, "core_status": get_audio_status()}
     elif modality == "image":
         from models.image_model import _load_custom_image_model as load_image_model
+        from models.image_model import get_status as get_image_status
         await asyncio.to_thread(load_image_model)
-        return {"status": "activated", "modality": modality}
+        return {"status": "processed", "modality": modality, "core_status": get_image_status()}
     return {"error": "Invalid modality"}
 
 class TextInput(BaseModel):
