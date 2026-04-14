@@ -23,13 +23,19 @@ def get_classifier():
                 logger.warning(f"Found local text model but failed to load ({e}). Falling back.")
 
         try:
-            logger.info("Loading Hugging Face text model (distilroberta)... This may take a moment.")
+            # Use a lighter DistilBERT model instead of RoBERTa for limited RAM environments like Render Free Tier
+            logger.info("Loading Lightweight text model (distilbert)...")
             from transformers import pipeline
-            _classifier = pipeline("text-classification", model="j-hartmann/emotion-english-distilroberta-base", return_all_scores=True)
+            _classifier = pipeline(
+                "text-classification", 
+                model="bhadresh-savani/distilbert-base-uncased-emotion", 
+                top_k=None,
+                low_cpu_mem_usage=True
+            )
             _model_format = "huggingface"
-            logger.info("Hugging Face text model loaded successfully.")
+            logger.info("Lightweight text model loaded successfully.")
         except Exception as e:
-            logger.error(f"Failed to load Hugging Face text model: {e}")
+            logger.error(f"Failed to load text model: {e}")
             _classifier = None
             _model_format = None
             

@@ -6,7 +6,7 @@ pydantic
 python-dotenv
 
 # ── ML Frameworks ────────────────────────────────────────────────────────────
-torch
+torch --index-url https://download.pytorch.org/whl/cpu
 transformers
 tensorflow-cpu
 tf-keras
@@ -26,13 +26,8 @@ opencv-python-headless
 numpy
 pandas
 scikit-learn
-imbalanced-learn
 scipy
 joblib
-tqdm
 
 # ── NLP Utilities ─────────────────────────────────────────────────────────────
-nltk
-datasets
-# ── Pipeline Utilities ────────────────────────────────────────────────────────
-kagglehub
+# Removed datasets, kagglehub, and extra libraries to save memory on Render
