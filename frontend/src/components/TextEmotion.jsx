@@ -143,17 +143,25 @@ export default function TextEmotion({ onReturnHome }) {
 
              {viewState === 'result' && result && (
                 <div className="flex flex-col h-full fade-in flex-1">
-                   {result.error ? (
-                     <div className="flex-1 flex flex-col items-center justify-center gap-8 text-center">
-                        <div className="w-24 h-24 rounded-3xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shadow-2xl">
-                           <Zap size={48} />
-                        </div>
-                        <div className="space-y-3">
-                           <h3 className="text-3xl font-syne font-extrabold text-white uppercase tracking-tighter">Analysis Interrupted</h3>
-                           <p className="text-zinc-500 max-w-sm text-sm leading-relaxed">{result.message}</p>
-                        </div>
-                     </div>
-                   ) : (
+                    {result.error ? (
+                      <div className="flex-1 flex flex-col items-center justify-center gap-8 text-center px-4">
+                         <div className="w-24 h-24 rounded-3xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shadow-2xl">
+                            <Zap size={48} />
+                         </div>
+                         <div className="space-y-3">
+                            <h3 className="text-3xl font-syne font-extrabold text-white uppercase tracking-tighter">Analysis Interrupted</h3>
+                            <p className="text-zinc-500 max-w-sm text-sm leading-relaxed mx-auto">
+                               {typeof result.error === 'string' ? result.error : result.message || 'The Neural Core encountered an unexpected interruption.'}
+                            </p>
+                         </div>
+                         <button 
+                            onClick={() => { setViewState('input'); setResult(null); setText(''); }}
+                            className="px-8 py-3 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all"
+                         >
+                            Return to Input
+                         </button>
+                      </div>
+                    ) : (
                     <div className="flex-1 flex flex-col">
                         {/* HERO RESULT SECTION */}
                         <div className="relative p-8 md:p-10 rounded-[2.5rem] bg-white/[0.03] border border-white/10 mb-10 overflow-hidden group shadow-2xl">
@@ -174,13 +182,19 @@ export default function TextEmotion({ onReturnHome }) {
                                  </div>
                               </div>
 
-                              <div className="flex flex-col items-center">
-                                 <div className="text-5xl md:text-6xl font-black font-syne text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20 tracking-tighter leading-snug mb-1 pt-2">
-                                    {((result.confidence || 0) * 100).toFixed(1)}%
+                               <div className="flex flex-col items-center">
+                                  <div className="text-5xl md:text-6xl font-black font-syne text-transparent bg-clip-text bg-gradient-to-b from-white to-white/20 tracking-tighter leading-snug mb-1 pt-2">
+                                     {((result.confidence || 0) * 100).toFixed(1)}%
+                                  </div>
+                                   <span className={`font-bold uppercase tracking-[0.3em] text-[10px] ${getEmotionColor(result.emotion).includes('cyan') ? 'text-cyan-400' : getEmotionColor(result.emotion).includes('amber') || getEmotionColor(result.emotion).includes('yellow') ? 'text-amber-400' : getEmotionColor(result.emotion).includes('rose') ? 'text-rose-400' : 'text-white/40'}`}>Confidence Score</span>
+                               </div>
+                               
+                               {result.note && (
+                                 <div className="mt-4 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-400 text-[8px] font-bold uppercase tracking-widest animate-pulse">
+                                    {result.note}
                                  </div>
-                                  <span className={`font-bold uppercase tracking-[0.3em] text-[10px] ${getEmotionColor(result.emotion).includes('cyan') ? 'text-cyan-400' : getEmotionColor(result.emotion).includes('amber') || getEmotionColor(result.emotion).includes('yellow') ? 'text-amber-400' : getEmotionColor(result.emotion).includes('rose') ? 'text-rose-400' : 'text-white/40'}`}>Confidence Score</span>
-                              </div>
-                           </div>
+                               )}
+                            </div>
                         </div>
                         
                         <div className="space-y-10 flex-1">

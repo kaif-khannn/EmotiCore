@@ -51,13 +51,47 @@ EMOTION_MAP = {
     "surprise": "Surprise"
 }
 
+def get_fallback_emotion(text: str) -> dict:
+    """A zero-dependency keyword-based fallback for emotion detection."""
+    text = text.lower()
+    scores = {"Happy": 0.0, "Sad": 0.0, "Angry": 0.0, "Fear": 0.0, "Surprise": 0.0, "Disgust": 0.0, "Neutral": 0.1}
+    
+    keywords = {
+        "Happy": ["good", "great", "happy", "wonderful", "excellent", "joy", "love", "amazing"],
+        "Sad": ["bad", "sad", "sorry", "unhappy", "cry", "depressed", "hurt", "lonely"],
+        "Angry": ["angry", "mad", "hate", "fight", "annoyed", "furious", "kill", "stupid"],
+        "Fear": ["scared", "afraid", "fear", "terror", "danger", "worry", "panic"],
+        "Surprise": ["wow", "huge", "surprise", "unbelievable", "omg", "whoa"],
+        "Disgust": ["gross", "eww", "disgust", "nasty", "revolt", "sick"]
+    }
+    
+    for emotion, words in keywords.items():
+        for word in words:
+            if word in text:
+                scores[emotion] += 1.0
+                
+    winner = max(scores, key=scores.get)
+    # Normalize roughly
+    total = sum(scores.values()) or 1.0
+    breakdown = {k: round(v/total, 2) for k, v in scores.items()}
+    
+    return {
+        "modality": "text",
+        "emotion": winner,
+        "confidence": 0.5 if winner != "Neutral" else 0.1,
+        "breakdown": breakdown,
+        "note": "Lightweight fallback mode active"
+    }
+
 def predict_text_emotion(text: str) -> dict:
     if not text.strip():
          return {"error": "Empty text provided", "modality": "text", "emotion": "Unknown", "confidence": 0}
          
     classifier, fmt = get_classifier()
     if classifier is None:
-        return {"error": "Model not loaded", "modality": "text", "emotion": "Unknown", "confidence": 0}
+        # If all else fails, use the lightweight fallback instead of returning an error
+        logger.warning("Neural models failed to load. Using keyword fallback.")
+        return get_fallback_emotion(text)
         
     try:
         breakdown = {}
@@ -93,4 +127,5 @@ def predict_text_emotion(text: str) -> dict:
             "breakdown": breakdown
         }
     except Exception as e:
-        return {"error": str(e), "modality": "text", "emotion": "Unknown", "confidence": 0}
+        logger.error(f"Text prediction expansion failed: {e}. Falling back to keywords.")
+        return get_fallback_emotion(text)
