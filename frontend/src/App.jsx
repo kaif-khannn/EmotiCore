@@ -70,10 +70,12 @@ function App() {
       setIsLoading(true);
       if (mod === 'status') fetchStatus();
       setSidebarOpen(false);
+      
+      // Artificial delay to allow for the neural animation effect
       setTimeout(() => {
           setActiveModule(mod);
           setIsLoading(false);
-      }, 500);
+      }, 600);
   };
 
 
@@ -239,7 +241,7 @@ function App() {
       {/* Primary Floating Action Button */}
       <button 
          onClick={() => setSidebarOpen(true)}
-         className="fixed bottom-6 lg:bottom-10 left-6 lg:left-10 z-20 w-14 h-14 lg:w-16 lg:h-16 rounded-2xl obsidian-panel flex items-center justify-center text-white hover:bg-white/5 transition-all hover:scale-105 shadow-2xl border-t-white/10 group"
+         className="fixed bottom-6 lg:bottom-10 left-6 lg:left-10 z-40 w-14 h-14 lg:w-16 lg:h-16 rounded-2xl obsidian-panel flex items-center justify-center text-white hover:bg-white/5 transition-all hover:scale-105 shadow-2xl border-t-white/10 group"
       >
          <Menu size={24} className="lg:w-7 lg:h-7 group-hover:text-cyan-400 transition-colors" />
       </button>

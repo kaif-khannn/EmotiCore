@@ -20,13 +20,19 @@ PORT: int = int(os.getenv("PORT", "8000"))
 DEBUG: bool = os.getenv("DEBUG", "false").lower() in ("1", "true", "yes")
 
 # ── CORS ──────────────────────────────────────────────────────────────────────
-# Comma-separated list of allowed origins, e.g.:
-#   CORS_ORIGINS=http://localhost:5173,https://your-production-domain.com
+# Comma-separated list of allowed origins.
+# For production safety, we specifically include current deployment domains.
 _cors_raw: str = os.getenv(
     "CORS_ORIGINS",
-    "http://localhost:5173,http://127.0.0.1:5173,https://emoticore.pages.dev"
+    "http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://127.0.0.1:3000"
 )
 CORS_ORIGINS: list[str] = [o.strip() for o in _cors_raw.split(",") if o.strip()]
+
+# Add wildcard domains for preview deployments if needed
+CORS_ORIGINS.extend([
+    "https://emoticore.pages.dev",
+    "https://emoticore.onrender.com"
+])
 
 # ── Dataset / model paths ─────────────────────────────────────────────────────
 REPO_ROOT: str = os.getenv("REPO_ROOT", _root)

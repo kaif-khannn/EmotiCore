@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'https://emoticore.onrender.com',
+        target: 'http://localhost:8000',
         changeOrigin: true,
       },
     },
