@@ -36,13 +36,12 @@ app = FastAPI(
 # ── CORS ───────────────────────────────────────────────────────────────────────
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=CORS_ORIGINS,
-    allow_origin_regex=r"https://.*\.emoticore\.pages\.dev",
-    allow_credentials=True,
+    allow_origins=["*"],
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-logger.info(f"CORS configured for: {CORS_ORIGINS} and Cloudflare preview domains")
+logger.info("CORS configured with wildcard allow_origins for maximum compatibility")
 
 # ── Global exception handler ───────────────────────────────────────────────────
 @app.exception_handler(Exception)
